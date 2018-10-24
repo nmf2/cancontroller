@@ -8,6 +8,7 @@ A CAN controller implemented in Arduino
 
 * [Document](https://drive.google.com/file/d/1cG-o6DxjQhY0OXzspa5x9uHW97o1-NI1/view?usp=sharing)
 * [References Folder](https://drive.google.com/drive/folders/1Kc-vxOsX4m6GS7ZHthxBcfbaj1YZBo_B?usp=sharing)
+* [Project Docs](https://drive.google.com/drive/folders/1hOQ5uCZ8EEg_wf3wZ52xD4ALIwwc-l9M?usp=sharing)
 
 ### Bit Timing Logic
 
