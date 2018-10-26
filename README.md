@@ -7,6 +7,11 @@ A CAN controller implemented in Arduino
 ### Project Specification
 
 * [Document](https://drive.google.com/file/d/1cG-o6DxjQhY0OXzspa5x9uHW97o1-NI1/view?usp=sharing)
+<<<<<<< HEAD
+=======
+* [References Folder](https://drive.google.com/drive/folders/1Kc-vxOsX4m6GS7ZHthxBcfbaj1YZBo_B?usp=sharing)
+* [Project Docs](https://drive.google.com/drive/folders/1hOQ5uCZ8EEg_wf3wZ52xD4ALIwwc-l9M?usp=sharing)
+>>>>>>> cf14cbbc4ed24019c6a705dbccb74f2aa56c4124
 
 ### Bit Timing Logic
 * [References Folder](https://drive.google.com/drive/folders/1Kc-vxOsX4m6GS7ZHthxBcfbaj1YZBo_B?usp=sharing)
