@@ -4,7 +4,7 @@ Implementation of Bit Timing Logic
 
 ## Configuration
 
-Time Quanta (tq) = 100 ms (for testing reasons)
+Time Quanta (tq) = 100 ms (for testing reasons)git 
 Synchronization Jump Width(SJW) = 1 tq
 Synchronization Segment Size = 1 tq 
 Propagation Segment Size = 1 tq
