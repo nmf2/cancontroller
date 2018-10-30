@@ -18,7 +18,7 @@ void setup(){
     pinMode(RED_LED,OUTPUT);
     digitalWrite(RED_LED,OFF);
     pinMode(BLUE_LED_TRIGGER,INPUT);
-    Serial.begin(9600);
+    //Serial.begin(9600);
     //The BLUE_LED_TRIGGER pin calls the function blueF when the falling edge happenns at that pin
     //a debounce circuit might be needed
     attachInterrupt(digitalPinToInterrupt(BLUE_LED_TRIGGER),blueF,FALLING);
@@ -30,10 +30,15 @@ void setup(){
 }
 
 void loop(){
-    /*r = digitalRead(BLUE_LED_TRIGGER);
-    Serial.println(r);
-    delay(50);*/
+    //r = digitalRead(BLUE_LED_TRIGGER);
+    //Serial.println(r);
+    //delay(50);
     //Serial.println(digitalRead(BLUE_LED_TRIGGER));
+    //delay(50);
+    //if(r)
+   //   digitalWrite(BLUE_LED,ON);
+    //else
+      //digitalWrite(BLUE_LED,OFF);
 }
 
 void blueF(){
