@@ -11,7 +11,7 @@
 #define OFF LOW
 
 //Bit Timing Logic Parameters
-#define TIME_QUANTA 1000000 //tq of 100000 microseconds -> .1s (for testing reasons)
+#define TIME_QUANTA 1000000 //tq of 1s 
 #define SJW 4
 #define SYNC_SEG_SIZE 1
 #define PROP_SEG_SIZE 1
@@ -53,8 +53,8 @@ void CCLinit(); //Initialize the variables of CAN Controller
 void setup() {
   Serial.begin(9600);
   //Initializing Arduino IOs
-  pinMode(LED_PHASE1,OUTPUT);
-  pinMode(LED_PHASE2,OUTPUT);
+  //pinMode(LED_PHASE1,OUTPUT);
+  //pinMode(LED_PHASE2,OUTPUT);
   pinMode(PIN_RX,INPUT);
   pinMode(PIN_TX,OUTPUT);
   attachInterrupt(digitalPinToInterrupt(PIN_RX),BTLsync,FALLING);//call BTLsync when a falling edge is detected at PIN_RX
@@ -68,10 +68,13 @@ void setup() {
   Timer1.attachInterrupt( BTLogic );
 }
 
-// void loop() {
+ void loop() {
 //   // put your main code here, to run repeatedly:
-//   //Serial.println(btl_state);
-// }
+//Serial.print(" ");
+//Serial.println(writing_point);
+//Serial.println(phase_error);
+//Serial.println(tq_cnt);
+}
 
 void BTLinit(){
   last_btl_state = STATE_SYNC; 
@@ -110,6 +113,7 @@ void BTLogic(){
     resync = false; 
 
   //debug
+  /*
   if(btl_state == STATE_SEG1){
     digitalWrite(LED_PHASE1,ON);
     digitalWrite(LED_PHASE2,OFF);
@@ -125,7 +129,7 @@ void BTLogic(){
   else{ // btl_state == Sync
     digitalWrite(LED_PHASE1,OFF);
     digitalWrite(LED_PHASE2,OFF);
-  }
+  }*/
   //end debug
 
   //BTL - State Machine
@@ -143,7 +147,7 @@ void BTLogic(){
         tq_cnt = 0; // will be incremented soon, that's why it's not 1.
         hard_sync = false; // unset flag
       }
-      tq_cnt++
+      tq_cnt++;
       if(last_btl_state == STATE_SYNC){ // If arrived from SYNC
         writing_point = false;
         resize = 0;
@@ -183,10 +187,10 @@ void BTLogic(){
         last_btl_state = STATE_SEG2;
       }
       else{
-        if(tq_cnt_seg2 == 1)
-          sample_point = false;
         tq_cnt_seg2++;
         tq_cnt++;
+        if(tq_cnt_seg2 == 1)
+          sample_point = false;
       }
       phase_error = -BIT_NOMINAL_SIZE + (tq_cnt + resize);
       if(tq_cnt_seg2 >= (SEG2_SIZE - 1)){
@@ -195,7 +199,7 @@ void BTLogic(){
       break;
 
     case STATE_PESTATE2:
-      resync = false
+      resync = false;
       if(last_btl_state == STATE_SEG2){
         resize = max(-SJW,phase_error);
         //Serial.print("phase_error: ");
@@ -220,15 +224,29 @@ void BTLogic(){
       break;
 
   }
+
+  Serial.print("tq_cnt: ");
+  Serial.print(tq_cnt);
+  Serial.print("\t,last_btl_state:");
+  Serial.print(last_btl_state);
+  Serial.print("\t,sp:");
+  Serial.print(sample_point);
+  Serial.print("\t,wp:");
+  Serial.print(writing_point);
+  Serial.print("\t,error:");
+  Serial.println(phase_error);
 }
 
 void BTLsync(){
   if(idle_bus){
     hard_sync = true;
     writing_point = true;
+    Serial.println("H");
   }
-  else
+  else{
     resync = true;
+    Serial.println("R");
+  }
 }
 
 void CCLinit(){
