@@ -5,13 +5,11 @@
 #define PIN_TX 3 //Tx from transceiver
 
 //LEDs
-#define LED_PHASE1 8 //blue
-#define LED_PHASE2 9 //red 
 #define ON HIGH
 #define OFF LOW
 
 //Bit Timing Logic Parameters
-#define TIME_QUANTA 1000000 //tq of 1s 
+#define TIME_QUANTA 3000000 //tq of 1s 
 #define SJW 4
 #define SYNC_SEG_SIZE 1
 #define PROP_SEG_SIZE 1
@@ -48,34 +46,28 @@ void BTLsync(); //Set the resync or hard_sync flag, it is triggered when a falli
 bool idle_bus = false; //Indicate if the CAN bus is idle or not
 
 //CAN Controller Functions
-void CCLinit(); //Initialize the variables of CAN Controller
+//void CCLinit(); //Initialize the variables of CAN Controller
 
 void setup() {
   Serial.begin(9600);
   //Initializing Arduino IOs
-  //pinMode(LED_PHASE1,OUTPUT);
-  //pinMode(LED_PHASE2,OUTPUT);
   pinMode(PIN_RX,INPUT);
   pinMode(PIN_TX,OUTPUT);
   attachInterrupt(digitalPinToInterrupt(PIN_RX),BTLsync,FALLING);//call BTLsync when a falling edge is detected at PIN_RX
 
-  //
-  //CCLinit();
+  //CCLinit(); //coment to test resync logic. uncoment to test hardsync logic
 
   //Initializing Bit Timing Logic variables
   BTLinit();
   Timer1.initialize(TIME_QUANTA); //interruption using timer1 every time quanta
-  Timer1.attachInterrupt( BTLogic );
+  Timer1.attachInterrupt( BTLogic ); //call BTLogic when the Timer1 interruption is triggered
 }
 
  void loop() {
-//   // put your main code here, to run repeatedly:
-//Serial.print(" ");
-//Serial.println(writing_point);
-//Serial.println(phase_error);
-//Serial.println(tq_cnt);
+   //Serial.println(digitalRead(PIN_RX));
 }
 
+//Initialize Bit Timing Logic Variables
 void BTLinit(){
   last_btl_state = STATE_SYNC; 
   btl_state = STATE_SEG1;
@@ -90,12 +82,14 @@ void BTLinit(){
   resync = false;
 }
 
+
+//Bit Timing State Machine (see line 63)
 void BTLogic(){
   //Syncing Logic
   if(hard_sync){
-    // Set last state to SYNC simulating that the bit has just started.
-    last_btl_state = STATE_SYNC;
-    btl_state = STATE_SEG1;
+    // Set current state to SYNC, simulating that the bit has just started.
+    //last_btl_state = STATE_SYNC;
+    btl_state = STATE_SYNC;
   }
   else if(resync && (btl_state == STATE_SEG1)){
     // If a resync happens in the STATE_SEG 1, the next state will be the STATE_PESTATE1
@@ -112,29 +106,13 @@ void BTLogic(){
   else if(resync)
     resync = false; 
 
-  //debug
-  /*
-  if(btl_state == STATE_SEG1){
-    digitalWrite(LED_PHASE1,ON);
-    digitalWrite(LED_PHASE2,OFF);
-  }
-  else if(btl_state == STATE_SEG2){
-    digitalWrite(LED_PHASE1,OFF);
-    digitalWrite(LED_PHASE2,ON);
-  }
-  else if((btl_state == STATE_PESTATE1) || (btl_state == STATE_PESTATE2)){
-    digitalWrite(LED_PHASE1,ON);
-    digitalWrite(LED_PHASE2,ON);
-  }
-  else{ // btl_state == Sync
-    digitalWrite(LED_PHASE1,OFF);
-    digitalWrite(LED_PHASE2,OFF);
-  }*/
-  //end debug
-
   //BTL - State Machine
   switch(btl_state){
     case STATE_SYNC:
+      if(hard_sync){
+        tq_cnt = 0; // will be incremented soon, that's why it's not 1.
+        hard_sync = false; // unset flag
+      }
       writing_point = true; // Write time!
       tq_cnt = 0; // Reset global counter
       last_btl_state = STATE_SYNC; // This state'll be the last on the next tq
@@ -143,10 +121,6 @@ void BTLogic(){
       break;
 
     case STATE_SEG1:
-      if(hard_sync){
-        tq_cnt = 0; // will be incremented soon, that's why it's not 1.
-        hard_sync = false; // unset flag
-      }
       tq_cnt++;
       if(last_btl_state == STATE_SYNC){ // If arrived from SYNC
         writing_point = false;
@@ -167,10 +141,6 @@ void BTLogic(){
       resync = false;
       if(last_btl_state == STATE_SEG1){
         resize = min(SJW,phase_error);
-        // Serial.print("phase_error: ");
-        // Serial.println(phase_error);
-        // Serial.print("resize: ");
-        // Serial.println(resize);
         last_btl_state = STATE_PESTATE1;
       }
       tq_cnt_seg1++;
@@ -234,21 +204,30 @@ void BTLogic(){
   Serial.print("\t,wp:");
   Serial.print(writing_point);
   Serial.print("\t,error:");
-  Serial.println(phase_error);
+  Serial.print(phase_error);
+  Serial.print("\t,idle_bus:");
+  Serial.println(idle_bus);
 }
 
+//Sets the synchronization flags (see line 56)
 void BTLsync(){
   if(idle_bus){
+    Timer1.restart();
     hard_sync = true;
-    writing_point = true;
-    Serial.println("H");
+    //writing_point = true;
+    Serial.println("Hardsync");
   }
   else{
     resync = true;
-    Serial.println("R");
+    Serial.println("Resync");
   }
 }
 
+//Initialize Can Controller Variables
 void CCLinit(){
   idle_bus = true;
 }
+
+
+//void setup(){}
+//void loop(){}
