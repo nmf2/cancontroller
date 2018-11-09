@@ -29,4 +29,23 @@ void BTL_print(); //helps when debugging
 //CAN Controller Functions
 void CCL_init(); //Initialize CAN Controller Variables
 
+//TOGGLE Parameters
+#define TOGGLE_SIZE 5
+#define TOGGLE_INDEX_TQ 0
+#define TOGGLE_INDEX_HARDSYNC 1
+#define TOGGLE_INDEX_RESYNC 2
+#define TOGGLE_INDEX_STATE_MSB 3
+#define TOGGLE_INDEX_STATE_LSB 4
+#define TOGGLE_PIN_TQ 8
+#define TOGGLE_PIN_HARDSYNC 9
+#define TOGGLE_PIN_RESYNC 10
+#define TOGGLE_PIN_STATE_MSB 11
+#define TOGGLE_PIN_STATE_LSB 12
+
+//TOGGLE Functions
+void TOGGLE_init();     //Initialize Toggle Vector
+void TOGGLE_write();    //Refresh Toggle outputs
+void TOGGLE_write_serial(); //outputs on Serial
+void TOGGLE_state();    //Refresh toggle[TOGGLE_PIN_STATE_X], X=LSB or X=MSB
+
 #endif

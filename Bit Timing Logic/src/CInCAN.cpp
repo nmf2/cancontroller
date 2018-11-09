@@ -26,6 +26,9 @@ bool btl_resync; // indicate a resynchronization (if the falling edge have
 //CAN Controller Variables
 bool ccl_bus_idle; //indicate when the bus is idle
 
+//TOGGLE Vector
+bool toggle[TOGGLE_SIZE];
+
 
 //Bit Timing Logic Functions Definition
 void BTL_init(){ 
@@ -55,6 +58,7 @@ void BTL_edge_detector(){
 void BTL_new_time_quanta(){
     //Serial.println("CLOCK");
     tq_flag = true;
+    toggle[TOGGLE_INDEX_TQ] = !toggle[TOGGLE_INDEX_TQ];//TOGGLE
 }
 
 void BTL_sm(){
@@ -62,12 +66,15 @@ void BTL_sm(){
         cli();
         if(ccl_bus_idle){
             btl_hard_sync = true;
+            toggle[TOGGLE_INDEX_HARDSYNC] = !toggle[TOGGLE_INDEX_HARDSYNC];//TOGGLE
             Timer1.restart();   //it will trigger Timer1 Interruption and 
                                 //reset its clock. The ISR will be called after
                                 //the functino sei() is called
         }
-        else 
+        else {
             btl_resync = true;
+            toggle[TOGGLE_INDEX_RESYNC] = !toggle[TOGGLE_INDEX_RESYNC];//TOGGLE
+        }
         rx_falling = false;
         sei();
     }
@@ -76,13 +83,13 @@ void BTL_sm(){
         //state machine here!
         tq_flag = false;
         if(btl_hard_sync){
-            Serial.println("HARD_SYNC");
+            //Serial.println("HARD_SYNC");
             btl_next_state = BTL_STATE_SYNC; //Forces the Sync state.
             btl_hard_sync = false;
         }
         else if(btl_resync){
             if(btl_resync_enable){
-                Serial.println("RESYNC");
+                //Serial.println("RESYNC");
                 if(btl_current_state == BTL_STATE_TSEG1){
                     btl_resize = min(BTL_SJW,btl_phase_error);  
                                                         //in this case, the phase
@@ -187,7 +194,8 @@ void BTL_sm(){
                         btl_next_state = BTL_STATE_SYNC;
                 break;
         } 
-    BTL_print();
+    //BTL_print();
+    //TOGGLE_state();
     }
 }
 
@@ -227,4 +235,58 @@ void BTL_print(){
 //CAN Controller Functions Definition
 void CCL_init(){
     ccl_bus_idle = false;
+}
+
+//TOGGLE Lines
+//Time Quanta -> 61
+//HardSync -> 69
+//Resync -> 76
+//state -> 198
+
+//TOGGLE Functions Definition
+void TOGGLE_init(){//main.cpp line 21
+    toggle[TOGGLE_INDEX_TQ] = false;
+    toggle[TOGGLE_INDEX_HARDSYNC] = false;
+    toggle[TOGGLE_INDEX_RESYNC] = false;
+    toggle[TOGGLE_INDEX_STATE_MSB] = false;
+    toggle[TOGGLE_INDEX_STATE_LSB] = false;
+    pinMode(TOGGLE_PIN_TQ,OUTPUT);     
+    pinMode(TOGGLE_PIN_HARDSYNC,OUTPUT);
+    pinMode(TOGGLE_PIN_RESYNC,OUTPUT);
+    pinMode(TOGGLE_PIN_STATE_MSB,OUTPUT);
+    pinMode(TOGGLE_PIN_STATE_LSB,OUTPUT);
+}
+
+void TOGGLE_write(){//main.cpp line 39
+    digitalWrite(TOGGLE_PIN_TQ,toggle[TOGGLE_INDEX_TQ]);
+    digitalWrite(TOGGLE_PIN_HARDSYNC,toggle[TOGGLE_INDEX_HARDSYNC]);
+    digitalWrite(TOGGLE_PIN_RESYNC,toggle[TOGGLE_INDEX_RESYNC]);
+    digitalWrite(TOGGLE_PIN_STATE_MSB,toggle[TOGGLE_INDEX_STATE_MSB]);
+    digitalWrite(TOGGLE_PIN_STATE_LSB,toggle[TOGGLE_INDEX_STATE_LSB]);
+}
+
+void TOGGLE_write_serial(){//main.cpp line 40
+    Serial.print(toggle[TOGGLE_INDEX_TQ]);
+    Serial.print(" ");
+    Serial.print(toggle[TOGGLE_INDEX_HARDSYNC]);
+    Serial.print(" ");
+    Serial.print(toggle[TOGGLE_INDEX_RESYNC]);
+    Serial.print(" ");
+    Serial.println(2*toggle[TOGGLE_INDEX_STATE_MSB]+ toggle[TOGGLE_INDEX_STATE_LSB]);
+}
+
+
+void TOGGLE_state(){//line 198
+    if(btl_current_state == BTL_STATE_SYNC){
+        toggle[TOGGLE_INDEX_STATE_LSB] = false;
+        toggle[TOGGLE_INDEX_STATE_MSB] = false;
+    }
+    else if((btl_current_state == BTL_STATE_TSEG1) || (btl_current_state == BTL_STATE_PESTATE1)){
+        toggle[TOGGLE_INDEX_STATE_LSB] = true;
+        toggle[TOGGLE_INDEX_STATE_MSB] = false;
+    }
+    else{
+        toggle[TOGGLE_INDEX_STATE_LSB] = false;
+        toggle[TOGGLE_INDEX_STATE_MSB] = true;
+    }
 }
