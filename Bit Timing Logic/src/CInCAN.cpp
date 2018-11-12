@@ -19,7 +19,7 @@ int btl_resize; // calculate the bit timing adjustment for resychronization due
 bool btl_sample_point;  // indicate when the sample point happened.
 bool btl_writing_point; // indicate when the writing point happened.
 bool btl_hard_sync; // indicate a hard synchronization.
-bool btl_resync; // indicate a resynchronization (if the falling edge have 
+bool btl_resync; // indicate a resynchronization (i.e. if the falling edge have 
                  // happened out of sync segment).
 
 //CAN Controller Flags
@@ -67,9 +67,9 @@ void BTL_sm(){
         if(ccl_bus_idle){
             btl_hard_sync = true;
             toggle[TOGGLE_INDEX_HARDSYNC] = !toggle[TOGGLE_INDEX_HARDSYNC];//TOGGLE
-            Timer1.restart();   //it will trigger Timer1 Interruption and 
+            Timer1.restart();   //it will trigger Timer1 Interrupt and 
                                 //reset its clock. The ISR will be called after
-                                //the functino sei() is called
+                                //the sei() function is called
         }
         else {
             btl_resync = true;
@@ -80,42 +80,34 @@ void BTL_sm(){
     }
 
     if(tq_flag){
-        //state machine here!
+        // state machine here!
         tq_flag = false;
         if(btl_hard_sync){
             //Serial.println("HARD_SYNC");
             btl_next_state = BTL_STATE_SYNC; //Forces the Sync state.
             btl_hard_sync = false;
         }
-        else if(btl_resync){
-            if(btl_resync_enable){
-                //Serial.println("RESYNC");
-                if(btl_current_state == BTL_STATE_TSEG1){
-                    btl_resize = min(BTL_SJW,btl_phase_error);  
-                                                        //in this case, the phase
-                                                        //error ir positive. The
-                                                        //adjustment due to a 
-                                                        //phase error is limited
-                                                        //to SJW
-                    btl_next_state = BTL_STATE_PESTATE1;
-                    btl_resync_enable = false;
-                }
-                else if(btl_current_state == BTL_STATE_TSEG2){
-                    btl_resize = min(BTL_SJW,-btl_phase_error);
-                                                        //in this case, the phase
-                                                        //error is negative. The 
-                                                        //adjustment due to a 
-                                                        //phase error is limited
-                                                        //to -SJW
-                    if(-btl_phase_error <= BTL_SJW)
-                    //The protocol can handle all the phase error
-                        btl_next_state = BTL_STATE_SYNC;
-                    else
-                    //The protocol cannot handle all the phase error due to SJW
-                        btl_next_state = BTL_STATE_PESTATE2;
-                    btl_resync_enable = false;
-                }
-
+        else if(btl_resync && btl_resync_enable){
+            //Serial.println("RESYNC");
+            if(btl_current_state == BTL_STATE_TSEG1){
+                // in this case, the phase error ir positive. The adjustment due
+                // to a phase error is limited to SJW
+                btl_resize = min(BTL_SJW,btl_phase_error);  
+                btl_next_state = BTL_STATE_PESTATE1;
+                btl_resync_enable = false;
+            }
+            else if(btl_current_state == BTL_STATE_TSEG2){
+                // in this case, the phase error is negative. The adjustment due 
+                // to a phase error is limited to -SJW
+                btl_resize = min(BTL_SJW,-btl_phase_error);
+                if(-btl_phase_error <= BTL_SJW)
+                //The protocol can handle all the phase error
+                    // btl_next_state = BTL_STATE_SYNC;
+                    btl_next_state = BTL_STATE_TSEG1;
+                else
+                //The protocol cannot handle all the phase error due to SJW
+                    btl_next_state = BTL_STATE_PESTATE2;
+                btl_resync_enable = false;
             }
 
             btl_resync = false;
@@ -140,14 +132,26 @@ void BTL_sm(){
                 //Nominal Length: BTL_TSEG1_SIZE = 8tq (currently)
             case BTL_STATE_TSEG1:
                 btl_tq_cnt++;
-                if(btl_current_state == BTL_STATE_SYNC){
+                btl_writing_point = false;
+                if(btl_current_state == BTL_STATE_SYNC) {
                     //This if runs at the first time quanta of TSEG1
-                    btl_writing_point = false;
                     btl_tq_cnt_seg1 = 0;
                     btl_current_state = BTL_STATE_TSEG1;
+                } 
+                else if(btl_current_state == BTL_STATE_TSEG2) {
+                    // Runs if a resync happened and the SYNC_SEG was omitted
+                    btl_writing_point = true;
+                    btl_tq_cnt_seg1 = 0;
+                    btl_resync_enable = false; 
+                    // Only one synchronization may be done between two Sample Points
+                    btl_tq_cnt = 1; // SYNC has passed.
+                    btl_resize = 0; //
+                    btl_next_state = BTL_STATE_TSEG1;
+                    btl_current_state = BTL_STATE_TSEG1;
                 }
-                else 
+                else{
                     btl_tq_cnt_seg1++;
+                }
                 //The phase_error in TSEG1 matches with the value of the
                 //time quanta counter.
                 btl_phase_error = btl_tq_cnt;
