@@ -31,8 +31,8 @@
 //##  -> Monitoring TOGGLE vector: Uncomment line 198 (CInCAN.cpp).          ##      
 //##        via IOs:    Uncomment line 73 (main.cpp).                        ##
 //##        via Serial: Uncomment line 74 (main.cpp).                        ##
-//##        *NOTE: If you want to monitor via Serial Plotter, uncomment      ##
-//##               any other use of Serial port. (on Arduino IDE)            ##
+//##        *NOTE: monitor via Serial Plotter, uncomment any other use of    ##
+//##               Serial port. (on Arduino IDE).                            ##
 //##                                                                         ##
 //#############################################################################
 
@@ -52,7 +52,7 @@ void setup() {
     //Initializing Can Controller
     CCL_init();
     //Initializing TOGGLE
-    //TOGGLE_init();
+    TOGGLE_init();
 
     //Initializing Timer1 Interrupt
     Timer1.initialize(BTL_TIME_QUANTA);
@@ -70,10 +70,9 @@ void setup() {
 }
 
 void loop() {
-    //TOGGLE_write();
+    TOGGLE_write();
     //TOGGLE_write_serial(); //Ctrl+Shift+L to see in Serial Plotter.
                            //Must comment other Serial prints
                            //CInCAN.cpp line 54,59,86,92,197
     BTL_sm(); //runs the Bit Timing Logic State Machine
 }
-

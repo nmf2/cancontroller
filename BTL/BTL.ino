@@ -7,7 +7,7 @@
 #define PIN_TX 3 //Tx from 
 
 //Bit Timing Logic Parameters
-#define BTL_TIME_QUANTA 1000000 //tq of 1s 
+#define BTL_TIME_QUANTA 500000 //tq of 1s 
 #define BTL_SJW 4
 #define BTL_SYNC_SEG_SIZE 1
 #define BTL_PROP_SEG_SIZE 1
@@ -190,9 +190,14 @@ void BTL_sm(){
                                                         //adjustment due to a 
                                                         //phase error is limited
                                                         //to -SJW
-                    if(-btl_phase_error <= BTL_SJW)
+                    if(-btl_phase_error <= BTL_SJW){
                     //The protocol can handle all the phase error
-                        btl_next_state = BTL_STATE_SYNC;
+                        btl_resync_enable = false;
+                        btl_tq_cnt = 0;
+                        btl_resize = 0;
+                        btl_phase_error = 0;
+                        btl_next_state = BTL_STATE_TSEG1;
+                    }
                     else
                     //The protocol cannot handle all the phase error due to SJW
                         btl_next_state = BTL_STATE_PESTATE2;
@@ -223,9 +228,14 @@ void BTL_sm(){
                 //Nominal Length: BTL_TSEG1_SIZE = 8tq (currently)
             case BTL_STATE_TSEG1:
                 btl_tq_cnt++;
-                if(btl_current_state == BTL_STATE_SYNC){
+                btl_writing_point = false;
+                if(btl_current_state == BTL_STATE_TSEG2){
+                    btl_writing_point = true;
+                    btl_tq_cnt_seg1 = 0;
+                    btl_current_state = BTL_STATE_TSEG1;
+                }
+                else if(btl_current_state == BTL_STATE_SYNC){
                     //This if runs at the first time quanta of TSEG1
-                    btl_writing_point = false;
                     btl_tq_cnt_seg1 = 0;
                     btl_current_state = BTL_STATE_TSEG1;
                 }
@@ -281,7 +291,6 @@ void BTL_sm(){
     TOGGLE_state();
     }
 }
-
 void BTL_print(){
     if(!(rx_falling && ccl_bus_idle)){
         Serial.print("tq_cnt: ");
@@ -317,7 +326,7 @@ void BTL_print(){
 
 //CAN Controller Functions Definition
 void CCL_init(){
-    ccl_bus_idle = false;
+    ccl_bus_idle = true;
 }
 
 //TOGGLE Lines
@@ -351,11 +360,15 @@ void TOGGLE_write(){//main.cpp line 39
 void TOGGLE_write_serial(){//main.cpp line 40
     Serial.print(toggle[TOGGLE_INDEX_TQ]);
     Serial.print(" ");
-    Serial.print(toggle[TOGGLE_INDEX_HARDSYNC]);
+    Serial.print(toggle[TOGGLE_INDEX_HARDSYNC]-1.5);
     Serial.print(" ");
-    Serial.print(toggle[TOGGLE_INDEX_RESYNC]);
+    Serial.print(toggle[TOGGLE_INDEX_RESYNC]-3);
     Serial.print(" ");
-    Serial.println(2*toggle[TOGGLE_INDEX_STATE_MSB]+ toggle[TOGGLE_INDEX_STATE_LSB]);
+    Serial.print(2*toggle[TOGGLE_INDEX_STATE_MSB]+ toggle[TOGGLE_INDEX_STATE_LSB]+3);//add ln
+    Serial.print(" ");
+    Serial.print(btl_writing_point + -4.5);
+    Serial.print(" ");
+    Serial.println(btl_sample_point + -6);
 }
 
 

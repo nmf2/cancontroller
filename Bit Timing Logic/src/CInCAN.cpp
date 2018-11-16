@@ -53,6 +53,7 @@ void BTL_init(){
 void BTL_edge_detector(){
     //Serial.println("EDGE");
     rx_falling = true;
+    //btl_writing_point = ((btl_current_state == BTL_STATE_TSEG2) && (-btl_phase_error <= BTL_SJW)) || (btl_current_state == BTL_STATE_SYNC);
 }
 
 void BTL_new_time_quanta(){
@@ -66,6 +67,7 @@ void BTL_sm(){
         cli();
         if(ccl_bus_idle){
             btl_hard_sync = true;
+            btl_sample_point = false;
             toggle[TOGGLE_INDEX_HARDSYNC] = !toggle[TOGGLE_INDEX_HARDSYNC];//TOGGLE
             Timer1.restart();   //it will trigger Timer1 Interruption and 
                                 //reset its clock. The ISR will be called after
@@ -107,9 +109,14 @@ void BTL_sm(){
                                                         //adjustment due to a 
                                                         //phase error is limited
                                                         //to -SJW
-                    if(-btl_phase_error <= BTL_SJW)
+                    if(-btl_phase_error <= BTL_SJW){
                     //The protocol can handle all the phase error
-                        btl_next_state = BTL_STATE_SYNC;
+                        btl_resync_enable = false;
+                        btl_tq_cnt = 0;
+                        btl_resize = 0;
+                        btl_phase_error = 0;
+                        btl_next_state = BTL_STATE_TSEG1;
+                    }
                     else
                     //The protocol cannot handle all the phase error due to SJW
                         btl_next_state = BTL_STATE_PESTATE2;
@@ -140,9 +147,14 @@ void BTL_sm(){
                 //Nominal Length: BTL_TSEG1_SIZE = 8tq (currently)
             case BTL_STATE_TSEG1:
                 btl_tq_cnt++;
-                if(btl_current_state == BTL_STATE_SYNC){
+                btl_writing_point = false;
+                if(btl_current_state == BTL_STATE_TSEG2){
+                    btl_writing_point = true;
+                    btl_tq_cnt_seg1 = 0;
+                    btl_current_state = BTL_STATE_TSEG1;
+                }
+                else if(btl_current_state == BTL_STATE_SYNC){
                     //This if runs at the first time quanta of TSEG1
-                    btl_writing_point = false;
                     btl_tq_cnt_seg1 = 0;
                     btl_current_state = BTL_STATE_TSEG1;
                 }
@@ -195,7 +207,7 @@ void BTL_sm(){
                 break;
         } 
     //BTL_print();
-    //TOGGLE_state();
+    TOGGLE_state();
     }
 }
 
@@ -266,13 +278,18 @@ void TOGGLE_write(){//main.cpp line 39
 }
 
 void TOGGLE_write_serial(){//main.cpp line 40
+    //These constants add offsets to the plots, so they don't overlap 
     Serial.print(toggle[TOGGLE_INDEX_TQ]);
     Serial.print(" ");
-    Serial.print(toggle[TOGGLE_INDEX_HARDSYNC]);
+    Serial.print(toggle[TOGGLE_INDEX_HARDSYNC] -1.5);
     Serial.print(" ");
-    Serial.print(toggle[TOGGLE_INDEX_RESYNC]);
+    Serial.print(toggle[TOGGLE_INDEX_RESYNC] -3.0);
     Serial.print(" ");
-    Serial.println(2*toggle[TOGGLE_INDEX_STATE_MSB]+ toggle[TOGGLE_INDEX_STATE_LSB]);
+    Serial.print(2*toggle[TOGGLE_INDEX_STATE_MSB]+ toggle[TOGGLE_INDEX_STATE_LSB] +3);
+    Serial.print(" ");
+    Serial.print(btl_writing_point + -4.5);
+    Serial.print(" ");
+    Serial.println(btl_sample_point + -6);
 }
 
 
