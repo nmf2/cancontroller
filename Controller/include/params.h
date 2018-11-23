@@ -41,13 +41,20 @@
 #define EOL_START_FLAG 0
 #define EOL_MINIMUM_END_FLAG 5
 
+#define DOMINANT 0
+#define RECESSIVE 1
+
+#define DATA_FRAME 0
+#define REMOTE_FRAME 1
+
 // Max frame size: 128 (64 bits of data)
+// Struct that represents a CAN Frame.
 typedef
 struct Frame {
-    bool raw[128];
+    bool data[128];
     int size;
     bool extended;
-    enum type{DATA, REMOTE};
+    bool type;
 }
 Frame;
 
