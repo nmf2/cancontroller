@@ -1,6 +1,6 @@
 // Data Frame (up to the start of the data frame)
-#ifndef CAN_PARAMS // Prevents double includes
-#define CAN_PARAMS // 
+#ifndef CAN_PARAMS // Prevents double include errors
+#define CAN_PARAMS
 #define BIT_START_OF_FRAME  0
 #define BIT_START_ID_A  1
 #define BIT_END_ID_A  11
@@ -58,14 +58,30 @@ struct Frame {
 }
 Frame;
 
-Frame frame;
-
 typedef
-enum State {IDLE, IDA, RTRA_SRR, IDE, r0, IDB, RTRB, r1_r0, DLC, PAYLOAD,
+enum State {IDA, RTRA_SRR, IDE, r0, IDB, RTRB, r1_r0, DLC, PAYLOAD,
             CRC, CRCd, ACK, ACKd, EOFR, INTERMISSION1, INTERMISSION2, 
-            ERROR_FLAG, ERROR_DELIMITER}
+            ERROR_FLAG, ERROR_DELIMITER, IDLE}
 State;
 
-State state;
+static inline char *state_str(State s)
+{
+    static const char *strings[] = {
+        "IDA", "RTRA_SRR", "IDE", "r0", "IDB", "RTRB", "r1_r0", "DLC", 
+        "PAYLOAD", "CRC", "CRCd", "ACK", "ACKd", "EOFR", "INTERMISSION1", 
+        "INTERMISSION2", "ERROR_FLAG", "ERROR_DELIMITER", "IDLE"
+    };
+
+    return strings[s];
+}
+
+// Functions
+void controller_sm();
+
+// Variables
+extern Frame frame;
+extern State state;
+extern bool rx;
+extern int bit_index;
 
 #endif

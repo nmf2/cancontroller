@@ -1,12 +1,13 @@
 #include <stdbool.h>
-#include "../include/params.h" // some include containing the Frame vector
 #include "../lib/util.h"
+#include "../include/interface.h"
 
 // To mark the frame as invalid do Frame[0] = 1 (should be zero)
 
-state = IDLE; // This var indicates the current sm's state.
 // Vars
 
+State state = IDLE; // This var indicates the current sm's state.
+Frame frame;
 bool rx = 0; // Data from transceiver
 bool err = 0; // Error Flag 
 int bit_index = 0;
@@ -32,7 +33,7 @@ int BIT_START_DLC_X,
 
 void controller_sm(){
     if (err == true){
-        state = ERROR_OVERLOAD;
+        state = ERROR_FLAG;
     }
     else if (state < INTERMISSION1){
         bit_index++; // Simply go to the next bit
@@ -154,7 +155,7 @@ void controller_sm(){
         // Start of intermission
         case INTERMISSION1:
             if(rx == 0){
-                state = ERROR_OVERLOAD;
+                state = ERROR_FLAG;
             }
             else if(ifs_index == IFS_END_INTERMISSION1){
                 state = INTERMISSION2;
@@ -185,11 +186,10 @@ void controller_sm(){
         case ERROR_FLAG:
             if (rx == 0){
                 eol_dominant_count++;
-                if (eol_dominant_count == 13){ 
+                if (eol_dominant_count >= 13){ 
                     /* need to reset the state, the fisrt bit of the delimiter
                        is dominant. 
                     */
-                    eol_index = 0;
                     eol_dominant_count = 0;
                 }
             } 
@@ -206,10 +206,16 @@ void controller_sm(){
             } else {
                 eol_recessive_count++;
                 if (eol_recessive_count == 7){
-                    state = ERROR_FLAG;
+                    state = INTERMISSION1;
+                    eol_recessive_count = 0;
+                    eol_dominant_count = 0;
                 }
             }
 
             break;
     }
+}
+
+void log(){
+    //printf("STATE");
 }
