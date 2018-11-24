@@ -1,5 +1,4 @@
 #include <Arduino.h>
-#include "params.h"
 
 void setup() {
   // put your setup code here, to run once:

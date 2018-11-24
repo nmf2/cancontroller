@@ -10,3 +10,7 @@ int bits_to_int(int start, int end, bool * data){
 
     return value;
 }
+
+int min(int a, int b){
+    return a < b ? a : b;
+}
