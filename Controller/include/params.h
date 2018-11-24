@@ -60,4 +60,12 @@ Frame;
 
 Frame frame;
 
+typedef
+enum State {IDLE, IDA, RTRA_SRR, IDE, r0, IDB, RTRB, r1_r0, DLC, PAYLOAD,
+            CRC, CRCd, ACK, ACKd, EOFR, INTERMISSION1, INTERMISSION2, 
+            ERROR_FLAG, ERROR_DELIMITER}
+State;
+
+State state;
+
 #endif

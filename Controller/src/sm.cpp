@@ -2,15 +2,10 @@
 #include "../include/params.h" // some include containing the Frame vector
 #include "../lib/util.h"
 
-typedef
-enum State {IDLE, IDA, RTRA_SRR, IDE, r0, IDB, RTRB, r1_r0, DLC, PAYLOAD,
-            CRC, CRCd, ACK, ACKd, EOFR, INTERMISSION1, INTERMISSION2, 
-            ERROR_OVERLOAD}
-State;
 // To mark the frame as invalid do Frame[0] = 1 (should be zero)
-// Vars
 
-State state; // This var indicates the current sm's state.
+state = IDLE; // This var indicates the current sm's state.
+// Vars
 
 bool rx = 0; // Data from transceiver
 bool err = 0; // Error Flag 
@@ -18,6 +13,8 @@ int bit_index = 0;
 int ifs_index = 0; //Inter-frame space index
 int idle_bus = 1; // Bus-is-idle flag
 int DLC_value = 0; // Integer value of the DLC field.
+int eol_recessive_count = 0;
+int eol_dominant_count = 0;
 
 // Dynamic bit indexes 
 int BIT_START_DLC_X,
@@ -43,19 +40,6 @@ void controller_sm(){
     }
 
     switch(state){
-        case IDLE:
-            if (rx == 1) {
-                idle_bus = 1;
-            }
-            else {
-                idle_bus = 0;
-                bit_index = 0;
-                frame.data[0] = 0;
-                DLC_value = 0;
-                state = IDA;
-            }
-            break;
-
         case IDA:
             if (bit_index == BIT_END_ID_A){ // this is the last bit of the IDA
                 state = RTRA_SRR;
@@ -185,6 +169,47 @@ void controller_sm(){
                 break;
             }
         
-        //TODO Figure out error state.
+        case IDLE:
+            if (rx == 1) {
+                idle_bus = 1;
+            }
+            else {
+                idle_bus = 0;
+                bit_index = 0;
+                frame.data[0] = 0;
+                DLC_value = 0;
+                state = IDA;
+            }
+            break;
+        
+        case ERROR_FLAG:
+            if (rx == 0){
+                eol_dominant_count++;
+                if (eol_dominant_count == 13){ 
+                    /* need to reset the state, the fisrt bit of the delimiter
+                       is dominant. 
+                    */
+                    eol_index = 0;
+                    eol_dominant_count = 0;
+                }
+            } 
+            else if (rx == 1 && eol_dominant_count >= 6){
+                state = ERROR_DELIMITER;
+                eol_recessive_count = 0;
+            }
+            break;
+        
+        case ERROR_DELIMITER:
+            if (rx == 0){ //error, go back to ERROR_FLAG
+                state = ERROR_FLAG;
+                eol_dominant_count = 1;
+            } else {
+                eol_recessive_count++;
+                if (eol_recessive_count == 7){
+                    state = ERROR_FLAG;
+                }
+            }
+
+            break;
     }
 }
