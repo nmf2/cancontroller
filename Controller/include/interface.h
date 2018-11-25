@@ -1,6 +1,6 @@
 // Data Frame (up to the start of the data frame)
-#ifndef CAN_PARAMS // Prevents double include errors
-#define CAN_PARAMS
+#ifndef _CAN_PARAMS // Prevents double include errors
+#define _CAN_PARAMS
 #define BIT_START_OF_FRAME  0
 #define BIT_START_ID_A  1
 #define BIT_END_ID_A  11
@@ -52,19 +52,22 @@
 typedef
 struct Frame {
     bool data[128];
-    int size;
-    bool extended;
-    bool type;
+    int payload_size; // in bytes
+    int frame_size; // in bits
+    bool extended; 
+    bool type; // data (0) or remote (1)?
 }
 Frame;
 
+/****************** Frame Walker States Variable *********************/
 typedef
 enum State {IDA, RTRA_SRR, IDE, r0, IDB, RTRB, r1_r0, DLC, PAYLOAD,
             CRC, CRCd, ACK, ACKd, EOFR, INTERMISSION1, INTERMISSION2, 
             ERROR_FLAG, ERROR_DELIMITER, IDLE}
 State;
 
-static inline char *state_str(State s)
+/*************** Mapping function from States to strings **************/
+static inline const char *state_str(State s)
 {
     static const char *strings[] = {
         "IDA", "RTRA_SRR", "IDE", "r0", "IDB", "RTRB", "r1_r0", "DLC", 
@@ -76,7 +79,11 @@ static inline char *state_str(State s)
 }
 
 // Functions
-void controller_sm();
+void frame_walker(); //frame_walker.cpp
+void framer(bool *id, bool *payload, Frame *frm); //framer.cpp
+ // util.cpp
+int bits_to_int(int start, int end, bool * data);
+int int_to_bits(int value, bool * array);
 
 // Global Variables
 extern Frame frame;
@@ -87,16 +94,16 @@ extern bool rx;
 extern int bit_index;
 extern int DLC_value;
 
-extern int BIT_START_DLC_X,
-    BIT_END_DLC_X,
-    BIT_START_DATA_X,
-    BIT_END_DATA_X,
-    BIT_Y_START_CRC_X,
-    BIT_Y_END_CRC_X,
-    BIT_Y_CRC_DELIMITER_X,
-    BIT_Y_ACK_X,
-    BIT_Y_ACK_DELMITER_X,
-    BIT_Y_START_EOF_X,
-    BIT_Y_END_EOF_X;
+extern int  BIT_START_DLC_X,
+            BIT_END_DLC_X,
+            BIT_START_DATA_X,
+            BIT_END_DATA_X,
+            BIT_Y_START_CRC_X,
+            BIT_Y_END_CRC_X,
+            BIT_Y_CRC_DELIMITER_X,
+            BIT_Y_ACK_X,
+            BIT_Y_ACK_DELMITER_X,
+            BIT_Y_START_EOF_X,
+            BIT_Y_END_EOF_X;
 
 #endif

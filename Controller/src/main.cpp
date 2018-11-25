@@ -25,7 +25,7 @@ void loop() {
         Serial.print(state_str(state));
         Serial.print("; Rx: ");
         Serial.print(rx);
-        controller_sm();
+        frame_walker();
         Serial.print("; bit_index: ");
         Serial.print(bit_index);
         Serial.print(" DLC: ");

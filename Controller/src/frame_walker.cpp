@@ -1,6 +1,6 @@
 #include <stdbool.h>
-#include "../lib/util.h"
 #include "../include/interface.h"
+//#include "../include/util.h"
 
 // To mark the frame as invalid do Frame[0] = 1 (should be zero)
 
@@ -30,8 +30,15 @@ int BIT_START_DLC_X,
     BIT_Y_START_EOF_X,
     BIT_Y_END_EOF_X;
 
+#ifndef min
 
-void controller_sm(){
+int min(int a, int b){
+    return a < b ? a : b;
+}
+
+#endif
+
+void frame_walker(){
     if (err == true){
         state = ERROR_FLAG;
     }
@@ -97,6 +104,7 @@ void controller_sm(){
              */  
             if (bit_index == BIT_END_DLC_X) {
                 DLC_value = bits_to_int(BIT_START_DLC_X, BIT_END_DLC_X, frame.data);
+                frame.payload_size = DLC_value;
                 if (frame.type == REMOTE_FRAME || DLC_value == 0){
                     state = CRC;
                     // Set up next state's limit indexes
