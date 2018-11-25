@@ -66,7 +66,7 @@ void controller_sm(){
         case r0:
             state = DLC;
             // Use standard frame's DLC index
-            BIT_START_DLC_X = BIT_END_DLC_A; 
+            BIT_START_DLC_X = BIT_START_DLC_A; 
             BIT_END_DLC_X = BIT_END_DLC_A;
             break;
         
@@ -85,7 +85,7 @@ void controller_sm(){
             if(bit_index == BIT_START_DLC_B - 1){ // Two bits have passed?
                 state = DLC; 
                 // Use extended frame's DLC index
-                BIT_START_DLC_X = BIT_END_DLC_B;
+                BIT_START_DLC_X = BIT_START_DLC_B;
                 BIT_END_DLC_X = BIT_END_DLC_B;
             }
             break;
@@ -107,7 +107,7 @@ void controller_sm(){
                     state = PAYLOAD;
                     // Set up next state's limit indexes
                     BIT_START_DATA_X = BIT_END_DLC_X + 1;
-                    BIT_END_DATA_X = BIT_START_DLC_A + min(64, DLC_value*8);
+                    BIT_END_DATA_X = BIT_START_DATA_X + min(64, DLC_value*8);
                 }
             }
         // Data Frame

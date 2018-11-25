@@ -78,11 +78,25 @@ static inline char *state_str(State s)
 // Functions
 void controller_sm();
 
-// Variables
+// Global Variables
 extern Frame frame;
 extern State state;
 extern bool rx;
+
+// Frame Walker Vars
 extern int bit_index;
 extern int DLC_value;
+
+extern int BIT_START_DLC_X,
+    BIT_END_DLC_X,
+    BIT_START_DATA_X,
+    BIT_END_DATA_X,
+    BIT_Y_START_CRC_X,
+    BIT_Y_END_CRC_X,
+    BIT_Y_CRC_DELIMITER_X,
+    BIT_Y_ACK_X,
+    BIT_Y_ACK_DELMITER_X,
+    BIT_Y_START_EOF_X,
+    BIT_Y_END_EOF_X;
 
 #endif
