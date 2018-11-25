@@ -2,7 +2,7 @@
 #include <TimerOne.h>
 #include "../include/interface.h"
 
-#define SECOND 3000000 // 1 second
+#define SECOND 1000000 // 1 second
 
 #define PIN_SP_TEST 12
 
@@ -12,7 +12,7 @@ void test_sample_point();
 void print_array(bool*, int);
 void setup() {
     Serial.begin(9600);
-    Timer1.initialize(SECOND);
+    Timer1.initialize(2*SECOND);
     Timer1.attachInterrupt(test_sample_point);
     pinMode(PIN_SP_TEST, INPUT);
 }
@@ -25,10 +25,12 @@ void loop() {
         Serial.print(state_str(state));
         Serial.print("; Rx: ");
         Serial.print(rx);
-        Serial.print("; bit_index: ");
-        Serial.println(bit_index);
-        print_array(frame.data, bit_index);
         controller_sm();
+        Serial.print("; bit_index: ");
+        Serial.print(bit_index);
+        Serial.print(" DLC: ");
+        Serial.println(DLC_value);
+        print_array(frame.data, bit_index);
     }
 }
 

@@ -97,7 +97,6 @@ void controller_sm(){
              */  
             if (bit_index == BIT_END_DLC_X) {
                 DLC_value = bits_to_int(BIT_START_DLC_X, BIT_END_DLC_X, frame.data);
-                
                 if (frame.type == REMOTE_FRAME || DLC_value == 0){
                     state = CRC;
                     // Set up next state's limit indexes
@@ -165,7 +164,7 @@ void controller_sm(){
 
         case INTERMISSION2:
             state = IDLE;
-            
+            ifs_index = 0;
             if(rx != 1){ // If rx == 0 execute the statements for IDLE as well
                 break;
             }
@@ -209,6 +208,7 @@ void controller_sm(){
                     state = INTERMISSION1;
                     eol_recessive_count = 0;
                     eol_dominant_count = 0;
+                    ifs_index = 0;
                 }
             }
 

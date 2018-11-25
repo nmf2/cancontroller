@@ -83,5 +83,6 @@ extern Frame frame;
 extern State state;
 extern bool rx;
 extern int bit_index;
+extern int DLC_value;
 
 #endif
