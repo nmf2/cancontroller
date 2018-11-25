@@ -6,6 +6,10 @@
 
 #define PIN_SP_TEST 12
 
+//Defining these here FOR NOW, should be defined in BTL module
+bool sp; 
+bool wp;
+
 int volatile sample_point = 0;
 
 void test_sample_point();
@@ -20,11 +24,11 @@ void setup() {
 void loop() {
     if(sample_point == 1){
         sample_point = 0;
-        rx = digitalRead(PIN_SP_TEST);
+        Rx = digitalRead(PIN_SP_TEST);
         Serial.print("State: ");
         Serial.print(state_str(state));
         Serial.print("; Rx: ");
-        Serial.print(rx);
+        Serial.print(Rx);
         frame_walker();
         Serial.print("; bit_index: ");
         Serial.print(bit_index);

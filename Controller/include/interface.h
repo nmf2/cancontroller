@@ -84,7 +84,7 @@ static inline const char *state_str(State s)
 void frame_walker(); 
 
 //framer.cpp
-void framer(bool *id, bool *payload, Frame *frm); 
+int framer(bool *id, bool *payload, Frame *frm); 
 
 // util.cpp
 int bits_to_int(int start, int end, bool * data);
@@ -98,15 +98,15 @@ bool set_in_frame(Frame frm); // Sets frame to be written
 extern Frame frame;
 extern State state;
 extern bool wp;
-extern bool rx;
-extern bool Tx;
-extern bool lost_arbitration;
+extern bool sp;
+extern bool Rx;
+
 
 /**************** Frame Walker Vars ****************/
 extern int bit_index;
 extern int DLC_value;
 
-extern int  BIT_START_DLC_X,
+extern int BIT_START_DLC_X,
             BIT_END_DLC_X,
             BIT_START_DATA_X,
             BIT_END_DATA_X,
@@ -119,6 +119,14 @@ extern int  BIT_START_DLC_X,
             BIT_Y_END_EOF_X;
 
 /**************** Stuffer Vars ****************/
+extern bool writing_mode;
+extern bool Tx;
 
+/**************** Bit Monitor Vars ***************/
+extern bool bit_err;
+extern bool lost_arbitration;
+
+/**************** Bit Stuff Monitor Vars ***************/
+extern bool Rstuff_flag;
 
 #endif

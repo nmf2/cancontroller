@@ -6,9 +6,12 @@ int bit_count = 0;
 bool stuff_flag = 0;
 int frm_index = 0; // Equivalent to bit_index in Frame Walker
 bool wait_next_frame = 1; // activated when lost arbitration
-bool buffer_full; // Indicates if there a frame send write
+bool writing_mode; // Indicates if it's currently writing a frame;
 
 void stuffer(){
+    if (wp == false){
+        return;
+    }
     if (wait_next_frame){
         Tx = 1;
     }
@@ -33,7 +36,7 @@ void stuffer(){
         wait_next_frame = 1;
         Tx = 1; 
     }
-    else if (buffer_full){ // if there is anything to write
+    else if (writing_mode){ // if there is anything to write
         Tx = in_frame.data[frm_index];
         if (state < CRCd){
             if (frm_index == 0){
@@ -50,7 +53,7 @@ void stuffer(){
         }
         frm_index++;
         if (frm_index >= in_frame.frame_size){ //finished writing
-            buffer_full = 0; // signaling that there is nothing to write
+            writing_mode = 0; // signaling that there is nothing to write
         }
     } 
     else { // Nothing to do, all in order and no frames to send
@@ -67,12 +70,12 @@ void stuffer(){
 }
 
 bool set_in_frame(Frame frm){
-    if(buffer_full){
-        return 0; // Busy
+    if(writing_mode){
+        return 1; // Busy
     }
     else {
         in_frame = frm;
-        buffer_full = 1;
+        writing_mode = 1;
     }
-    return 1; // OK
+    return 0; // OK
 };

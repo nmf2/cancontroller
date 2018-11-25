@@ -3,7 +3,10 @@
 
 bool *crc_calc ();
 
-void framer (bool *id, bool *payload, Frame *frm){
+int framer (bool *id, bool *payload, Frame *frm){
+    if(writing_mode == true){ // Already writing a frame, reject
+        return 1;  // Signaling full buffer
+    }
     int i = 1, // frm->data's index.
         j = 0, // *id or *payload index.
         bit_end_data,
@@ -117,4 +120,8 @@ void framer (bool *id, bool *payload, Frame *frm){
     }
     frm->frame_size = i; // By the end, the i'th bit is the one after the last 
                          // EOF bit.
+    int buffer_full;
+    buffer_full = set_in_frame(*frm);
+
+    return buffer_full;    
 }

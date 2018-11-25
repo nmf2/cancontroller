@@ -8,7 +8,7 @@
 
 State state = IDLE; // This var indicates the current sm's state.
 Frame frame;
-bool rx = 0; // Data from transceiver
+bool Rx = 0; // Data from transceiver
 bool err = 0; // Error Flag 
 int bit_index = 0;
 int ifs_index = 0; //Inter-frame space index
@@ -39,12 +39,15 @@ int min(int a, int b){
 #endif
 
 void frame_walker(){
-    if (err == true){
+    if (Rstuff_flag == true || sp == 0){ // Simply return
+        return;
+    }
+    else if (err == true){
         state = ERROR_FLAG;
     }
     else if (state < INTERMISSION1){
         bit_index++; // Simply go to the next bit
-        frame.data[bit_index] = rx; // take data in
+        frame.data[bit_index] = Rx; // take data in
     }
 
     switch(state){
@@ -55,12 +58,12 @@ void frame_walker(){
             break;
 
         case RTRA_SRR:
-            frame.type = rx; // If 0, data frame, else, remote frame.
+            frame.type = Rx; // If 0, data frame, else, remote frame.
             state = IDE;
             break;
 
         case IDE:
-            frame.extended = rx; // If 0, standard, if 1, extended.
+            frame.extended = Rx; // If 0, standard, if 1, extended.
             if (frame.extended == true){
                 state = IDB;
             }
@@ -161,7 +164,7 @@ void frame_walker(){
         
         // Start of intermission
         case INTERMISSION1:
-            if(rx == 0){
+            if(Rx == 0){
                 state = ERROR_FLAG;
             }
             else if(ifs_index == IFS_END_INTERMISSION1){
@@ -173,12 +176,12 @@ void frame_walker(){
         case INTERMISSION2:
             state = IDLE;
             ifs_index = 0;
-            if(rx != 1){ // If rx == 0 execute the statements for IDLE as well
+            if(Rx != 1){ // If Rx == 0 execute the statements for IDLE as well
                 break;
             }
         
         case IDLE:
-            if (rx == 1) {
+            if (Rx == 1) {
                 idle_bus = 1;
             }
             else {
@@ -191,7 +194,7 @@ void frame_walker(){
             break;
         
         case ERROR_FLAG:
-            if (rx == 0){
+            if (Rx == 0){
                 eol_dominant_count++;
                 if (eol_dominant_count >= 13){ 
                     /* need to reset the state, the fisrt bit of the delimiter
@@ -200,14 +203,14 @@ void frame_walker(){
                     eol_dominant_count = 0;
                 }
             } 
-            else if (rx == 1 && eol_dominant_count >= 6){
+            else if (Rx == 1 && eol_dominant_count >= 6){
                 state = ERROR_DELIMITER;
                 eol_recessive_count = 0;
             }
             break;
         
         case ERROR_DELIMITER:
-            if (rx == 0){ //error, go back to ERROR_FLAG
+            if (Rx == 0){ //error, go back to ERROR_FLAG
                 state = ERROR_FLAG;
                 eol_dominant_count = 1;
             } else {
