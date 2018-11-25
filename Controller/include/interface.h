@@ -1,6 +1,7 @@
 // Data Frame (up to the start of the data frame)
 #ifndef _CAN_PARAMS // Prevents double include errors
 #define _CAN_PARAMS
+/************************* CAN Bit Indexes *************************/
 #define BIT_START_OF_FRAME  0
 #define BIT_START_ID_A  1
 #define BIT_END_ID_A  11
@@ -48,7 +49,7 @@
 #define REMOTE_FRAME 1
 
 // Max frame size: 128 (64 bits of data)
-// Struct that represents a CAN Frame.
+/***************** Struct that represents a CAN Frame **********************/
 typedef
 struct Frame {
     bool data[128];
@@ -78,19 +79,30 @@ static inline const char *state_str(State s)
     return strings[s];
 }
 
-// Functions
-void frame_walker(); //frame_walker.cpp
-void framer(bool *id, bool *payload, Frame *frm); //framer.cpp
- // util.cpp
+/********************* Functions *********************/
+//frame_walker.cpp
+void frame_walker(); 
+
+//framer.cpp
+void framer(bool *id, bool *payload, Frame *frm); 
+
+// util.cpp
 int bits_to_int(int start, int end, bool * data);
 int int_to_bits(int value, bool * array);
 
-// Global Variables
+// stuffer.cpp
+void stuffer(); // Takes care of bit stuffing
+bool set_in_frame(Frame frm); // Sets frame to be written
+
+/**************** Global Variables ****************/
 extern Frame frame;
 extern State state;
+extern bool wp;
 extern bool rx;
+extern bool Tx;
+extern bool lost_arbitration;
 
-// Frame Walker Vars
+/**************** Frame Walker Vars ****************/
 extern int bit_index;
 extern int DLC_value;
 
@@ -105,5 +117,8 @@ extern int  BIT_START_DLC_X,
             BIT_Y_ACK_DELMITER_X,
             BIT_Y_START_EOF_X,
             BIT_Y_END_EOF_X;
+
+/**************** Stuffer Vars ****************/
+
 
 #endif
