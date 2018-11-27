@@ -2,6 +2,7 @@
 #include "../include/interface.h"
 
 bool lost_arbitration;
+bool bit_err;
 
 void bit_monitor(){
     if(wp == false){

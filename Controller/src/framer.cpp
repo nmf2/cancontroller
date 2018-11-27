@@ -1,7 +1,7 @@
 #include "../include/interface.h"
 #include "stdbool.h"
 
-bool *crc_calc ();
+bool * crc_calc ();
 
 int framer (bool *id, bool *payload, Frame *frm){
     if(writing_mode == true){ // Already writing a frame, reject

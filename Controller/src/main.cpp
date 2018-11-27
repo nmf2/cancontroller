@@ -9,8 +9,10 @@
 //Defining these here FOR NOW, should be defined in BTL module
 bool sp; 
 bool wp;
+bool Rx = 1; // Data from transceiver
 
-//int volatile sp = 0;
+
+bool err = false; // Error Flag 
 
 void test_sp();
 void print_array(bool*, int);
@@ -28,15 +30,18 @@ void loop() {
     if(sp == 1){
         Rx = digitalRead(PIN_SP_TEST);
         Rx = !Rx; // Make recessive the default
-        bit_stuff_monitor();
+        stuffer(); // Responsible for writing.
+        bit_stuff_monitor(); // Reading
         
-        frame_walker();
+        frame_walker(); // Core State Machine
         
-        ack_checker();
+        // Error signaling
+        ack_checker(); 
         form_checker();
         bit_monitor();
         
         err = stuff_err | ack_err | bit_err | form_err | crc_err;
+
         debug();
         sp = 0; // makes sure it enters in the if only once.
     }

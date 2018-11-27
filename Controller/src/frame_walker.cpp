@@ -9,8 +9,7 @@
 State state = IDLE; // This var indicates the current sm's state.
 State last_state = IDLE; // This var indicates the current sm's state.
 Frame frame;
-bool Rx = 0; // Data from transceiver
-bool err = 0; // Error Flag 
+
 int bit_index = 0;
 int ifs_index = 0; //Inter-frame space index
 int idle_bus = 1; // Bus-is-idle flag

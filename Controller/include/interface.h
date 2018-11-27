@@ -113,6 +113,7 @@ extern State last_state;
 extern bool wp;
 extern bool sp;
 extern bool Rx;
+extern bool err;
 
 
 /**************** Frame Walker Vars ****************/
