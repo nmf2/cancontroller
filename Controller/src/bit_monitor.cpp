@@ -8,6 +8,9 @@ void bit_monitor(){
     if(wp == false){
         return; 
     }
+    if(bit_err == true){
+        bit_err = false;
+    }
     if(writing_mode){
         if(last_state < CRCd){
             if (Rx != Tx){

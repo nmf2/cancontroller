@@ -10,8 +10,8 @@ void form_checker(){
         return;
     }
     // Error has been treated, reset the flag and abort.
-    if(form_err == 1){
-        form_err = 0;
+    if(form_err == true){
+        form_err = false;
         return;
     }
     switch(last_state){
@@ -22,7 +22,7 @@ void form_checker(){
         */
         case IDE:                           //frame.data[BIT_IDE]  
             if (frame.data[BIT_SRR_B] == 0 && Rx == 1){
-                form_err = 1;
+                form_err = true;
             }
             break;
 
@@ -30,7 +30,7 @@ void form_checker(){
         case CRCd:
             //  frame.data[BIT_Y_CRC_DELIMITER_X]
             if (Rx == 0){
-                form_err = 1;
+                form_err = true;
             }
             break;
 
@@ -38,7 +38,7 @@ void form_checker(){
         case ACKd:
               //frame.data[BIT_Y_ACK_DELMITER_X]
             if (Rx == 0){
-                form_err = 1;
+                form_err = true;
             }
             break;
 
@@ -51,7 +51,7 @@ void form_checker(){
             if(Rx == 0 && (bit_index + 1) != BIT_Y_END_EOF_X){
                 // bit_index will only be incremented when frame_walker runs
                 // and it didn't happen yet.
-                form_err = 1;
+                form_err = true;
             }
             break;
         
@@ -61,9 +61,8 @@ void form_checker(){
                 state = ERROR_FLAG;
             }
             break;
-        
-        default: // just in case...
-            form_err = 0;
+
+        default:
             break;
     }
 }

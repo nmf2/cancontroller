@@ -153,4 +153,9 @@ extern bool ack_err;
 /**************** Form Checker Vars ***************/
 extern bool crc_err;
 
+
+/****************************** DEBUG ****************************************/
+extern int eol_dominant_count;
+
+extern int eol_recessive_count;
 #endif

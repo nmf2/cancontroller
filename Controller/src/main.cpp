@@ -62,9 +62,9 @@ void print_array(bool *array, int max){
 }
 
 void debug (){
-    Serial.print("State: ");
+    Serial.print(F("State: "));
     Serial.print(state_str(last_state));
-    Serial.print("; Rx: ");
+    Serial.print(F("; Rx: "));
     Serial.print(Rx);
     Serial.print(F("; bit_index: "));
     Serial.print(bit_index);
@@ -72,7 +72,13 @@ void debug (){
     Serial.print(DLC_value);
     Serial.print(F("; Rstuff_flag: "));
     Serial.print(Rstuff_flag);
+    Serial.print(F("; eol_recessive_count: "));
+    Serial.print(eol_recessive_count);
+    Serial.print(F("; eol_dominant_count: "));
+    Serial.print(eol_dominant_count);
+    
+    Serial.println();
+    print_array(frame.data, bit_index);
     Serial.println();
     
-    print_array(frame.data, bit_index);
 }
