@@ -10,36 +10,40 @@
 bool sp; 
 bool wp;
 
-int volatile sample_point = 0;
+//int volatile sp = 0;
 
-void test_sample_point();
+void test_sp();
 void print_array(bool*, int);
+void debug();
+
 void setup() {
     Serial.begin(9600);
     Timer1.initialize(2*SECOND);
-    Timer1.attachInterrupt(test_sample_point);
-    pinMode(PIN_SP_TEST, INPUT);
+    Timer1.attachInterrupt(test_sp);
+    pinMode(PIN_SP_TEST, INPUT_PULLUP);
+    state = IDLE;
 }
 
 void loop() {
-    if(sample_point == 1){
-        sample_point = 0;
+    if(sp == 1){
         Rx = digitalRead(PIN_SP_TEST);
-        Serial.print("State: ");
-        Serial.print(state_str(state));
-        Serial.print("; Rx: ");
-        Serial.print(Rx);
+        Rx = !Rx; // Make recessive the default
+        bit_stuff_monitor();
+        
         frame_walker();
-        Serial.print("; bit_index: ");
-        Serial.print(bit_index);
-        Serial.print(" DLC: ");
-        Serial.println(DLC_value);
-        print_array(frame.data, bit_index);
+        
+        ack_checker();
+        form_checker();
+        bit_monitor();
+        
+        err = stuff_err | ack_err | bit_err | form_err | crc_err;
+        debug();
+        sp = 0; // makes sure it enters in the if only once.
     }
 }
 
-void test_sample_point(){
-    sample_point = 1;
+void test_sp(){
+    sp = 1;
 }
 
 void print_array(bool *array, int max){
@@ -50,4 +54,20 @@ void print_array(bool *array, int max){
         Serial.print("|");
     }
     Serial.println();
+}
+
+void debug (){
+    Serial.print("State: ");
+    Serial.print(state_str(last_state));
+    Serial.print("; Rx: ");
+    Serial.print(Rx);
+    Serial.print(F("; bit_index: "));
+    Serial.print(bit_index);
+    Serial.print(F("; DLC: "));
+    Serial.print(DLC_value);
+    Serial.print(F("; Rstuff_flag: "));
+    Serial.print(Rstuff_flag);
+    Serial.println();
+    
+    print_array(frame.data, bit_index);
 }

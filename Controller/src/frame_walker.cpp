@@ -7,6 +7,7 @@
 // Vars
 
 State state = IDLE; // This var indicates the current sm's state.
+State last_state = IDLE; // This var indicates the current sm's state.
 Frame frame;
 bool Rx = 0; // Data from transceiver
 bool err = 0; // Error Flag 
@@ -49,7 +50,8 @@ void frame_walker(){
         bit_index++; // Simply go to the next bit
         frame.data[bit_index] = Rx; // take data in
     }
-
+    
+    last_state = state; // This state will be the last after this runs
     switch(state){
         case IDA:
             if (bit_index == BIT_END_ID_A){ // this is the last bit of the IDA
@@ -106,7 +108,8 @@ void frame_walker(){
              * the frame is extendend, only if it's remote.
              */  
             if (bit_index == BIT_END_DLC_X) {
-                DLC_value = bits_to_int(BIT_START_DLC_X, BIT_END_DLC_X, frame.data);
+                DLC_value = bits_to_int(BIT_START_DLC_X, BIT_END_DLC_X, 
+                                        frame.data);
                 frame.payload_size = DLC_value;
                 if (frame.type == REMOTE_FRAME || DLC_value == 0){
                     state = CRC;
@@ -118,7 +121,9 @@ void frame_walker(){
                     state = PAYLOAD;
                     // Set up next state's limit indexes
                     BIT_START_DATA_X = BIT_END_DLC_X + 1;
-                    BIT_END_DATA_X = BIT_START_DATA_X + min(64, DLC_value*8);
+                    BIT_END_DATA_X = BIT_START_DATA_X + min(64, DLC_value*8)-1;
+                    // The reason for the -1 is because the var is an
+                    // index.
                 }
             }
         // Data Frame
@@ -126,7 +131,7 @@ void frame_walker(){
             if (bit_index == BIT_END_DATA_X){
                 state = CRC;
                 BIT_Y_START_CRC_X = BIT_END_DATA_X + 1;
-                BIT_Y_END_CRC_X = BIT_Y_START_CRC_X + 15; // CRC size is 15
+                BIT_Y_END_CRC_X = BIT_Y_START_CRC_X + 15 - 1; // CRC size is 15
             }
             break;
         
@@ -164,10 +169,7 @@ void frame_walker(){
         
         // Start of intermission
         case INTERMISSION1:
-            if(Rx == 0){
-                state = ERROR_FLAG;
-            }
-            else if(ifs_index == IFS_END_INTERMISSION1){
+            if(ifs_index == IFS_END_INTERMISSION1){
                 state = INTERMISSION2;
             }
             ifs_index++;
@@ -222,7 +224,6 @@ void frame_walker(){
                     ifs_index = 0;
                 }
             }
-
             break;
     }
 }

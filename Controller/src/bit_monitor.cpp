@@ -8,14 +8,14 @@ void bit_monitor(){
         return; 
     }
     if(writing_mode){
-        if(state < CRCd){
+        if(last_state < CRCd){
             if (Rx != Tx){
                 lost_arbitration = true;
             } else {
                 lost_arbitration = false;
             }
         } 
-        else if (state >= CRCd && state <= EOFR && state != ACK) {
+        else if (last_state >= CRCd && last_state <= EOFR && last_state != ACK) {
             // If the state is between CRCd and EOFR and it's not ACK
             if(Rx != Tx) {
                 bit_err = true;

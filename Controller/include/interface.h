@@ -1,7 +1,7 @@
 // Data Frame (up to the start of the data frame)
 #ifndef _CAN_PARAMS // Prevents double include errors
 #define _CAN_PARAMS
-/************************* CAN Bit Indexes *************************/
+/************************* CAN Bit Indexes *************************/          
 #define BIT_START_OF_FRAME  0
 #define BIT_START_ID_A  1
 #define BIT_END_ID_A  11
@@ -94,9 +94,22 @@ int int_to_bits(int value, bool * array);
 void stuffer(); // Takes care of bit stuffing
 bool set_in_frame(Frame frm); // Sets frame to be written
 
+// bit_monitor.cpp
+void bit_monitor();
+
+// bit_stuff_monitor.cpp
+void bit_stuff_monitor();
+
+// form_checker.cpp
+void form_checker();
+
+// ack_checker.cpp
+void ack_checker();
+
 /**************** Global Variables ****************/
 extern Frame frame;
 extern State state;
+extern State last_state;
 extern bool wp;
 extern bool sp;
 extern bool Rx;
@@ -128,5 +141,15 @@ extern bool lost_arbitration;
 
 /**************** Bit Stuff Monitor Vars ***************/
 extern bool Rstuff_flag;
+extern bool stuff_err;
+
+/**************** Form Checker Vars ***************/
+extern bool form_err;
+
+/**************** Acknoledgement Checker Vars ***************/
+extern bool ack_err;
+
+/**************** Form Checker Vars ***************/
+extern bool crc_err;
 
 #endif

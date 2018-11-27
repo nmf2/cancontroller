@@ -2,6 +2,7 @@
 #include "../include/interface.h"
 
 bool Rstuff_flag;
+bool stuff_err;
 bool bsm_last_bit;
 bool bsm_bit_count;
 
@@ -17,9 +18,12 @@ void bit_stuff_monitor(){
             // Last bit equals current one
             bsm_bit_count++;
         }
-        if (bsm_bit_count >= 5){
+        if (bsm_bit_count == 5){
             Rstuff_flag = true;
             bsm_bit_count = 0;
+        }
+        else if (bsm_bit_count > 5){
+            stuff_err = true;
         }
         bsm_last_bit = Rx;
     }
