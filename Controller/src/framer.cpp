@@ -125,3 +125,13 @@ int framer (bool *id, bool *payload, Frame *frm){
 
     return buffer_full;    
 }
+
+void main(int argc, char const *argv[]){
+    Frame test_frame;
+    bool id[11] = { 0 };
+    test_frame.type = DATA_FRAME;
+    test_frame.extended = false;
+
+    framer();
+    return 0;
+}

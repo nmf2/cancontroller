@@ -35,23 +35,5 @@ void bit_stuff_monitor(){
             bsm_bit_count = 1;
         }
         bsm_last_bit = Rx;
-        // if(Rstuff_flag == true && bsm_last_bit == Rx){
-        //     stuff_err = false;
-        // } else if (Rstuff_flag == true  && bsm_last_bit != Rx) {
-        //     Rstuff_flag = false;
-        // }
-        // if (bsm_bit_count == 5){
-        //     Rstuff_flag = true;
-        // }
-        // else if (bsm_bit_count > 5){
-        //     stuff_err = true;
-        // } 
-        // if (bsm_last_bit == Rx){
-        //     // Last bit equals current one
-        //     bsm_bit_count++;
-        // } else {
-        //     bsm_bit_count = 0;
-        // }
-        // bsm_last_bit = Rx;
     }
 }

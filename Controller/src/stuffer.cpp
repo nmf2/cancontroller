@@ -5,8 +5,8 @@ bool Tx = 0;
 int bit_count = 0;
 bool stuff_flag = 0;
 int frm_index = 0; // Equivalent to bit_index in Frame Walker
-bool wait_next_frame = 1; // activated when lost arbitration
-bool writing_mode; // Indicates if it's currently writing a frame;
+bool wait_next_frame = 0; // activated when lost arbitration
+bool writing_mode = 0; // Indicates if it's currently writing a frame;
 
 void stuffer(){
     if (wp == false){
@@ -25,19 +25,18 @@ void stuffer(){
     else if (stuff_flag){ // If this has to be a stuff bit      
         Tx = !in_frame.data[frm_index - 1]; // Write the inverse of the last bit
 
-        stuff_flag = 0;
-        bit_count = 0;
+        stuff_flag = false;
+        bit_count = 1;
     }
     else if (state == ERROR_FLAG){
-        wait_next_frame = 1;
         Tx = 0;
     }
     else if (state == ERROR_DELIMITER){
-        wait_next_frame = 1;
         Tx = 1; 
     }
     else if (writing_mode){ // if there is anything to write
         Tx = in_frame.data[frm_index];
+        
         if (state < CRCd){
             if (frm_index == 0){
                 bit_count = 1;

@@ -18,21 +18,38 @@ void test_sp();
 void print_array(bool*, int);
 void debug();
 
+Frame test_frame;
+
 void setup() {
     Serial.begin(9600);
     Timer1.initialize(2*SECOND);
     Timer1.attachInterrupt(test_sp);
     pinMode(PIN_SP_TEST, INPUT_PULLUP);
-    state = IDLE;
+    
+    // Testing
+    Frame test_frame;
+    bool id[11] = { 0 };
+    test_frame.type = DATA_FRAME;
+    test_frame.extended = false;
+
+    
+
+    framer(id, nullptr, &test_frame);
+    print_array(test_frame.data, test_frame.frame_size - 1);
+    //End Testing
+
 }
 
 void loop() {
-    if(sp == 1){
-        Rx = digitalRead(PIN_SP_TEST);
-        Rx = !Rx; // Make recessive the default
+    if(wp == 1){
         stuffer(); // Responsible for writing.
+        wp = false;
+        Rx = Tx;
+    }
+    if(sp == 1){
+        //Rx = digitalRead(PIN_SP_TEST);
+        //Rx = !Rx; // Make recessive the default
         bit_stuff_monitor(); // Reading
-        err = stuff_err;
         
         frame_walker(); // Core State Machine
         
@@ -41,15 +58,16 @@ void loop() {
         form_checker();
         bit_monitor();
         
-        err = ack_err | bit_err | form_err | crc_err;
+        err = stuff_err | ack_err | bit_err | form_err | crc_err;
 
         debug();
-        sp = 0; // makes sure it enters in the if only once.
+        sp = false; // makes sure it enters in the if only once.
     }
 }
 
 void test_sp(){
-    sp = 1;
+    sp = true;
+    wp = true;
 }
 
 void print_array(bool *array, int max){
@@ -78,15 +96,23 @@ void debug (){
     Serial.print(F("; eol_dominant_count: "));
     Serial.print(eol_dominant_count);
     Serial.println();
+    Serial.print(F("; form_err: "));
+    Serial.print(form_err);
+    Serial.print(F("; ack_err: "));
+    Serial.print(ack_err);
+    Serial.print(F("; bit_err: "));
+    Serial.print(bit_err);
     Serial.print(F("; stuff_err: "));
     Serial.print(stuff_err);
-    Serial.print(F("; bsm_bit_count: "));
-    Serial.print(bsm_bit_count);
-    Serial.print(F("; bsm_last_bit: "));
-    Serial.print(bsm_last_bit);
+    // Serial.print(F("; bsm_bit_count: "));
+    // Serial.print(bsm_bit_count);
+    // Serial.print(F("; bsm_last_bit: "));
+    // Serial.print(bsm_last_bit);
     
     Serial.println();
     print_array(frame.data, bit_index);
+    Serial.println();
+    print_array(test_frame.data, test_frame.frame_size - 1);
     Serial.println();
     
 }

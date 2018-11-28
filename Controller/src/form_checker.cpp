@@ -4,6 +4,8 @@
 bool form_err;
 int eof_index;
 
+//(Checked)
+
 void form_checker(){
     // Make sure it only runs on sample point
     if (sp == 0){ 
@@ -20,14 +22,14 @@ void form_checker(){
             ‘recessive’ there is a form error, that is, the SRR bit must be one
             for extended frames.
         */
-        case IDE:                           //frame.data[BIT_IDE]  
+        case IDE:                           //frame.data[BIT_IDE]     (Checked)
             if (frame.data[BIT_SRR_B] == 0 && Rx == 1){
                 form_err = true;
             }
             break;
 
         // If the CRC delimiter is ‘dominant’
-        case CRCd:
+        case CRCd:                                                  //(Checked)
             //  frame.data[BIT_Y_CRC_DELIMITER_X]
             if (Rx == 0){
                 form_err = true;
@@ -35,7 +37,7 @@ void form_checker(){
             break;
 
         // If the ACK delimiter is ‘dominant’
-        case ACKd:
+        case ACKd:                                                  //(Checked)
               //frame.data[BIT_Y_ACK_DELMITER_X]
             if (Rx == 0){
                 form_err = true;
@@ -46,17 +48,15 @@ void form_checker(){
         If there is a dominant bit anywhere in the EOF field except for the 
         last (7th) bit.
         */
-        case EOFR:
+        case EOFR:                                                  //(Checked)
             // frame.data[eof_index]
-            if(Rx == 0 && (bit_index + 1) != BIT_Y_END_EOF_X){
-                // bit_index will only be incremented when frame_walker runs
-                // and it didn't happen yet.
+            if(Rx == 0 && bit_index != BIT_Y_END_EOF_X){
                 form_err = true;
             }
             break;
         
         // Dominant bit in any of the first two bits of Intermission
-        case INTERMISSION1:
+        case INTERMISSION1:                                         //(Checked)
             if(Rx == 0){
                 state = ERROR_FLAG;
             }

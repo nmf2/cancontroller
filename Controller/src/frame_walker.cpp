@@ -42,7 +42,7 @@ void frame_walker(){
     if (Rstuff_flag == true || sp == 0){ // Simply return
         return;
     }
-    else if (err == true){
+    if (err == true){
         state = ERROR_FLAG;
     }
     else if (state < INTERMISSION1){
@@ -51,6 +51,7 @@ void frame_walker(){
     }
     
     last_state = state; // This state will be the last after this runs
+
     switch(state){
         case IDA:
             if (bit_index == BIT_END_ID_A){ // this is the last bit of the IDA
@@ -89,6 +90,7 @@ void frame_walker(){
             break;
         
         case RTRB:
+            frame.type = Rx; // If 0, data frame, else, remote frame.
             state = r1_r0;
             break;
         
@@ -101,7 +103,7 @@ void frame_walker(){
             }
             break;
         // End extended
-        // TODO Add 'X' and 'Y' variables to simplify these conditions
+        
         case DLC:
             /* Since BIT_END_DLC_X is used, we don't have to worry about if
              * the frame is extendend, only if it's remote.
@@ -114,7 +116,8 @@ void frame_walker(){
                     state = CRC;
                     // Set up next state's limit indexes
                     BIT_Y_START_CRC_X = BIT_END_DLC_X + 1;
-                    BIT_Y_END_CRC_X = BIT_Y_START_CRC_X + 15; // CRC size is 15
+                    // CRC size is 15
+                    BIT_Y_END_CRC_X = BIT_Y_START_CRC_X + 15 - 1; 
                 }
                 else { // It's a DATA_FRAME and DLC_value is greater than zero.
                     state = PAYLOAD;
@@ -125,6 +128,7 @@ void frame_walker(){
                     // index.
                 }
             }
+            break;
         // Data Frame
         case PAYLOAD:
             if (bit_index == BIT_END_DATA_X){
@@ -134,7 +138,7 @@ void frame_walker(){
             }
             break;
         
-        //Remote Frame OR End of Data
+        // Remote Frame OR End of Payload
         case CRC:
             if (bit_index == BIT_Y_END_CRC_X){
                 state = CRCd;
@@ -155,7 +159,7 @@ void frame_walker(){
         case ACKd:
             state = EOFR;
             BIT_Y_START_EOF_X = BIT_Y_ACK_DELMITER_X + 1;
-            BIT_Y_END_EOF_X = BIT_Y_START_EOF_X + 7; // EOF is 7 bits long
+            BIT_Y_END_EOF_X = BIT_Y_START_EOF_X + 7 - 1; // EOF is 7 bits long
 
             break;
 
@@ -177,7 +181,7 @@ void frame_walker(){
         case INTERMISSION2:
             state = IDLE;
             ifs_index = 0;
-            if(Rx != 1){ // If Rx == 0 execute the statements for IDLE as well
+            if(Rx != 0){ // If Rx == 0 execute the statements for IDLE as well
                 break;
             }
         
@@ -214,7 +218,7 @@ void frame_walker(){
             if (Rx == 0){ //error, go back to ERROR_FLAG
                 state = ERROR_FLAG;
                 eol_dominant_count = 1;
-            } else {
+            } else { // Rx == RECESSIVE
                 eol_recessive_count++;
                 if (eol_recessive_count == 7){
                     state = INTERMISSION1;
@@ -225,8 +229,4 @@ void frame_walker(){
             }
             break;
     }
-}
-
-void log(){
-    //printf("STATE");
 }

@@ -19,7 +19,7 @@ void bit_monitor(){
                 lost_arbitration = false;
             }
         } 
-        else if (last_state >= CRCd && last_state <= EOFR && last_state != ACK) {
+        else if (last_state >= CRCd && last_state <= EOFR && last_state != ACK){
             // If the state is between CRCd and EOFR and it's not ACK
             if(Rx != Tx) {
                 bit_err = true;
