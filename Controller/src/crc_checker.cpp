@@ -7,3 +7,8 @@
 */
 
 bool crc_err = false;
+
+
+void crc_checker(){
+
+}
