@@ -32,6 +32,7 @@ void loop() {
         Rx = !Rx; // Make recessive the default
         stuffer(); // Responsible for writing.
         bit_stuff_monitor(); // Reading
+        err = stuff_err;
         
         frame_walker(); // Core State Machine
         
@@ -40,7 +41,7 @@ void loop() {
         form_checker();
         bit_monitor();
         
-        err = stuff_err | ack_err | bit_err | form_err | crc_err;
+        err = ack_err | bit_err | form_err | crc_err;
 
         debug();
         sp = 0; // makes sure it enters in the if only once.
@@ -76,6 +77,13 @@ void debug (){
     Serial.print(eol_recessive_count);
     Serial.print(F("; eol_dominant_count: "));
     Serial.print(eol_dominant_count);
+    Serial.println();
+    Serial.print(F("; stuff_err: "));
+    Serial.print(stuff_err);
+    Serial.print(F("; bsm_bit_count: "));
+    Serial.print(bsm_bit_count);
+    Serial.print(F("; bsm_last_bit: "));
+    Serial.print(bsm_last_bit);
     
     Serial.println();
     print_array(frame.data, bit_index);

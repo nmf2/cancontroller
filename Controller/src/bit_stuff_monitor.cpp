@@ -15,25 +15,43 @@ void bit_stuff_monitor(){
     }
     if(state == IDLE){
         bsm_bit_count = 1; // SOF bit.
-    }
-    if (state < CRCd){
-        if(Rstuff_flag == true){ // This is the bit after a stuff bit
+    } 
+    else if (state < CRCd){
+        if (Rstuff_flag == true){
             Rstuff_flag = false;
         }
+
         if (bsm_bit_count == 5){
             Rstuff_flag = true;
-            bsm_bit_count = 0;
-        }
-        else if (bsm_bit_count > 5){
-            stuff_err = true;
         } 
-        if (bsm_last_bit == Rx){
-            // Last bit equals current one
-            bsm_bit_count++;
+        else if (bsm_bit_count == 6){
+            stuff_err = true;
         }
+
+        if (bsm_last_bit == Rx){
+            bsm_bit_count++;
+        } 
         else {
-            stuff_err = false;
+            bsm_bit_count = 1;
         }
         bsm_last_bit = Rx;
+        // if(Rstuff_flag == true && bsm_last_bit == Rx){
+        //     stuff_err = false;
+        // } else if (Rstuff_flag == true  && bsm_last_bit != Rx) {
+        //     Rstuff_flag = false;
+        // }
+        // if (bsm_bit_count == 5){
+        //     Rstuff_flag = true;
+        // }
+        // else if (bsm_bit_count > 5){
+        //     stuff_err = true;
+        // } 
+        // if (bsm_last_bit == Rx){
+        //     // Last bit equals current one
+        //     bsm_bit_count++;
+        // } else {
+        //     bsm_bit_count = 0;
+        // }
+        // bsm_last_bit = Rx;
     }
 }

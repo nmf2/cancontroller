@@ -156,6 +156,9 @@ extern bool crc_err;
 
 /****************************** DEBUG ****************************************/
 extern int eol_dominant_count;
-
 extern int eol_recessive_count;
+
+extern int bsm_bit_count;
+extern bool bsm_last_bit;
+
 #endif
