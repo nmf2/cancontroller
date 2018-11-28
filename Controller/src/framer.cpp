@@ -36,14 +36,16 @@ int framer (bool *id, bool *payload, Frame *frm){
         if (frm->type == DATA_FRAME){
             frm->data[BIT_RTR_B] = 0; // Not remote
 
-            bit_end_data = BIT_START_DATA_B + 8*frm->payload_size; 
+            bit_end_data = BIT_START_DATA_B + 8*frm->payload_size - 1; 
 
-            for (i = BIT_START_DATA_B, j = 0; i <= bit_end_data; i++, j++){
-                frm->data[i] = payload[j];
-            }
+            if (bit_end_data != BIT_START_DATA_A){
+                for (i = BIT_START_DATA_B, j = 0; i <= bit_end_data; i++, j++){
+                    frm->data[i] = payload[j];
+                }
+            }            
 
             bit_start_crc = i;
-            bit_end_crc = i + 15;
+            bit_end_crc = i + 15 - 1;
         }
         else { //Remote Frame 
             frm->data[BIT_RTR_B] = 1; // Must be 1
@@ -59,36 +61,36 @@ int framer (bool *id, bool *payload, Frame *frm){
             frm->data[i] = dlc[j];
         }
 
-        /*
-            A FOR TREATING THE CRC
-        */
+        for(; i <= j; i++){ // Write EOF flag
+            frm->data[i] = 1;
+        }
 
         crc_d = bit_end_crc + 1;
         frm->data[crc_d] = 1; // write CRCd
         frm->data[crc_d + 1] = 1; // ACK
         frm->data[crc_d + 2] = 1; // ACKd
         i = crc_d + 3; // EOF
-        j = i + 7;
+        j = i + 7 - 1;
 
         for(; i <= j; i++){ // Write EOF flag
             frm->data[i] = 1;
         }
     }
     else { // Not extended
-        frm->data[BIT_IDE] = 1; // Must be recessive, not extended
+        frm->data[BIT_IDE] = 0; // Must be dominant, not extended
         frm->data[BIT_R0_A] = 0; // Must be dominant
 
         if (frm->type == DATA_FRAME){
             frm->data[BIT_RTR_A] = 0; // Must be dominant
 
-            bit_end_data = BIT_START_DATA_A + 8*frm->payload_size; 
+            bit_end_data = BIT_START_DATA_A + 8*frm->payload_size - 1; 
 
             for (i = BIT_START_DATA_A, j = 0; i <= bit_end_data; i++, j++){
                 frm->data[i] = payload[j];
             }
 
             bit_start_crc = i;
-            bit_end_crc = i + 15;
+            bit_end_crc = i + 15 - 1;
         }
         else { //Remote Frame 
             frm->data[BIT_RTR_A] = 1; // Must be 1
@@ -103,16 +105,16 @@ int framer (bool *id, bool *payload, Frame *frm){
             frm->data[i] = dlc[j];
         }
 
-        /*
-            A FOR TREATING THE CRC
-        */
+        for (i = bit_start_crc; i <= bit_end_crc; i++){
+            frm->data[i] = 0;
+        }
 
         crc_d = bit_end_crc + 1;
         frm->data[crc_d] = 1; // write CRCd
         frm->data[crc_d + 1] = 1; // ACK
         frm->data[crc_d + 2] = 1; // ACKd
         i = crc_d + 3; // Start of EOF
-        j = i + 7; // End of EOF
+        j = i + 7 - 1; // End of EOF
 
         for(; i <= j; i++){ // Write EOF flag
             frm->data[i] = 1;
@@ -124,14 +126,4 @@ int framer (bool *id, bool *payload, Frame *frm){
     buffer_full = set_in_frame(*frm);
 
     return buffer_full;    
-}
-
-void main(int argc, char const *argv[]){
-    Frame test_frame;
-    bool id[11] = { 0 };
-    test_frame.type = DATA_FRAME;
-    test_frame.extended = false;
-
-    framer();
-    return 0;
 }

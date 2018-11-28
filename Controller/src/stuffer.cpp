@@ -2,11 +2,12 @@
 
 Frame in_frame; // The frame to be sent
 bool Tx = 0;
-int bit_count = 0;
-bool stuff_flag = 0;
+int Sbit_count = 1;
+bool Tstuff_flag = 0;
 int frm_index = 0; // Equivalent to bit_index in Frame Walker
 bool wait_next_frame = 0; // activated when lost arbitration
 bool writing_mode = 0; // Indicates if it's currently writing a frame;
+bool last_Tx;
 
 void stuffer(){
     if (wp == false){
@@ -17,16 +18,16 @@ void stuffer(){
     }
     else if (lost_arbitration){
         Tx = 1;
-        bit_count = 0;
-        stuff_flag = 0;
+        Sbit_count = 1;
+        Tstuff_flag = 0;
         frm_index = 0;
         wait_next_frame = 1;
     }
-    else if (stuff_flag){ // If this has to be a stuff bit      
+    else if (Tstuff_flag){ // If this has to be a stuff bit      
         Tx = !in_frame.data[frm_index - 1]; // Write the inverse of the last bit
 
-        stuff_flag = false;
-        bit_count = 1;
+        Tstuff_flag = false;
+        Sbit_count = 1;
     }
     else if (state == ERROR_FLAG){
         Tx = 0;
@@ -38,17 +39,18 @@ void stuffer(){
         Tx = in_frame.data[frm_index];
         
         if (state < CRCd){
-            if (frm_index == 0){
-                bit_count = 1;
-            }
-            else if (in_frame.data[frm_index] == in_frame.data[frm_index - 1]){
+            // if (frm_index == 0){ // SOF
+            //     Sbit_count = 2;
+            // }
+            // else if (last_Tx == Tx){
+            if (last_Tx == Tx){
                 // Last bit equals current one
-                bit_count++;
+                Sbit_count++;
             }
-            if (bit_count >= 5){
-                stuff_flag = true;
-                bit_count = 0;
+            if(Sbit_count == 5){
+                Tstuff_flag = true;
             }
+
         }
         frm_index++;
         if (frm_index >= in_frame.frame_size){ //finished writing
@@ -58,11 +60,12 @@ void stuffer(){
     else { // Nothing to do, all in order and no frames to send
         Tx = 1;
     }
+    last_Tx = Tx;
 
     if (state == IDLE){
         wait_next_frame = false;
-        bit_count = 0;
-        stuff_flag = 0;
+        Sbit_count = 1;
+        Tstuff_flag = 0;
         frm_index = 0;
     }
     

@@ -161,4 +161,10 @@ extern int eol_recessive_count;
 extern int bsm_bit_count;
 extern bool bsm_last_bit;
 
+extern Frame in_frame;
+
+extern bool Tstuff_flag;
+
+extern int Sbit_count;
+
 #endif
