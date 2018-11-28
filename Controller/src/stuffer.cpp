@@ -39,18 +39,14 @@ void stuffer(){
         Tx = in_frame.data[frm_index];
         
         if (state < CRCd){
-            // if (frm_index == 0){ // SOF
-            //     Sbit_count = 2;
-            // }
-            // else if (last_Tx == Tx){
             if (last_Tx == Tx){
-                // Last bit equals current one
                 Sbit_count++;
+            } else {
+                Sbit_count = 1;
             }
             if(Sbit_count == 5){
                 Tstuff_flag = true;
             }
-
         }
         frm_index++;
         if (frm_index >= in_frame.frame_size){ //finished writing

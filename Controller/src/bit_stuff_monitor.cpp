@@ -20,19 +20,22 @@ void bit_stuff_monitor(){
         if (Rstuff_flag == true){
             Rstuff_flag = false;
         }
-        if (bsm_bit_count == 5){
+        
+        if (bsm_bit_count == 6){
+            stuff_err = true;
+            bsm_bit_count = 1;
+        }
+
+        if (bsm_bit_count >= 5){
             Rstuff_flag = true;
         } 
-        else if (bsm_bit_count == 6){
-            stuff_err = true;
-            bsm_bit_count = 0;
-        }
         if (bsm_last_bit == Rx){
             bsm_bit_count++;
         }
         else {
-            bsm_bit_count = 0;
+            bsm_bit_count = 1;
         }
+        
         bsm_last_bit = Rx;
     }
 }
