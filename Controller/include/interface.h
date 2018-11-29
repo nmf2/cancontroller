@@ -68,20 +68,7 @@ enum State {IDA, RTRA_SRR, IDE, r0, IDB, RTRB, r1_r0, DLC, PAYLOAD,
             ERROR_FLAG, ERROR_DELIMITER, IDLE}
 State;
 
-/*************** Mapping function from States to strings **************/
-static inline const char *state_str(State s)
-{
-    static const char *strings[] = {
-        "IDA", "RTRA_SRR", "IDE", "r0", "IDB", "RTRB", "r1_r0", "DLC", 
-        "PAYLOAD", "CRC", "CRCd", "ACK", "ACKd", "EOFR", "INTERMISSION1", 
-        "INTERMISSION2", "ERROR_FLAG", "ERROR_DELIMITER", "IDLE"
-    };
-
-    return strings[s];
-}
-
 /********************* Functions *********************/
-
 //main.cpp
 void print_array(bool *array, int max);
 
@@ -89,15 +76,18 @@ void print_array(bool *array, int max);
 void frame_walker(); 
 
 //framer.cpp
-int framer(uint64_t id, unsigned long long payload, bool extended, bool type, 
+int framer(uint64_t id, uint64_t payload, bool extended, bool type, 
             int payload_size, Frame *frm);  
 
 // util.cpp
-int bits_to_int(int start, int end, bool * data);
+int bits_to_int(int start, int end, bool *data);
 int int_to_bits(unsigned long long value, bool * array, int fixed_size);
-void printf_arr(bool* array, int end_index);
+void print_array(bool *array, int max);
+void printf_arr(bool *array, int end_index);
 void print_frame(Frame, bool);
-unsigned long long id_calc(unsigned long long id1,unsigned long long id2);
+uint64_t id_calc(uint64_t id1, uint64_t id2);
+static inline const char *state_str(State s);
+short next_crc(short crc_rg, bool nxt_bit);
 
 // stuffer.cpp
 void stuffer(); // Takes care of bit stuffing

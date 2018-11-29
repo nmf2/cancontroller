@@ -16,49 +16,27 @@ bool err = false; // Error Flag
 
 void test_sp();
 void debug();
+void testing();
 
 //Frame test_frame;
 
 void setup() {
     Serial.begin(9600);
-    //delay(500);
-    Timer1.initialize(MILLI);
-    Timer1.attachInterrupt(test_sp);
-    state = IDLE;
-    Rx = 1;
 
-    Serial.println(F("BEGIN"));
-    Serial.println();
+    Timer1.initialize(10*SECOND);
+    Timer1.attachInterrupt(test_sp);
     
     //pinMode(PIN_SP_TEST, INPUT_PULLUP);
     
-    //Testing  
-    Frame test_frame;
-    uint64_t test_id = id_calc(0x0449,0x3007A);
-    // Frames tested
-    // framer(0x7FF, 0, false, REMOTE_FRAME, 0, &test_frame);
-    // framer(0x0672, 0xAAAAAAAAAAAAAAAA, false, DATA_FRAME, 8, &test_frame);
-    // framer(0x0672, 0x0, false, DATA_FRAME, 0, &test_frame);
-    // framer(0x0672, 0x0, false, REMOTE_FRAME, 0, &test_frame); // CRC?
-    // framer(0x0672, 0x0, false, REMOTE_FRAME, 1, &test_frame);
-    // framer(test_id, 0xAAAAAAAAAAAAAAAA, true, DATA_FRAME, 8, &test_frame);
-    // framer(test_id, 0x0, true, REMOTE_FRAME, 0, &test_frame);
-    framer(0x7FF, 0, false, REMOTE_FRAME, 0, &test_frame);
-
-    print_frame(test_frame, false);
-    Serial.println(F("Frame data: "));
-    print_array(in_frame.data, in_frame.frame_size - 1);
-    Serial.println(F("-----------------------------------------------------"));
-    Serial.println();
-    // print_array(test_frame.data, test_frame.frame_size - 1);
-    // Serial.println(test_frame.frame_size);
-    //End Testing
-
+    testing();
+    
+    state = IDLE;
+    Rx = 1;
 }
 void loop() {
     if(sp == true){
         //Serial.println(F("WP"));
-        stuffer(); // Responsible for writing.
+        stuffer();
         Rx = Tx;
         wp = false;
         
@@ -67,13 +45,14 @@ void loop() {
         frame_walker(); // Core State Machine
         
         // Error signaling
-        //ack_checker(); 
+        // ack_checker(); 
         form_checker();
         bit_monitor();
 
         err = stuff_err | ack_err | bit_err | form_err | crc_err;
 
         debug();
+        
         sp = false; // makes sure it enters in the if only once.
     }
 }
@@ -83,14 +62,29 @@ void test_sp(){
     wp = true;
 }
 
-void print_array(bool *array, int max){
-    //Serial.print("|");
-    int i = 0;
-    for (; i <= max; i++){
-        Serial.print(array[i]);
-        //Serial.print("|");
-    }
-    Serial.println();
+
+
+void testing(){
+    //Testing  
+    Frame test_frame;
+    uint64_t test_id = id_calc(0x0449,0x3007A);
+    // Frames tested
+    // framer(0x7FF, 0, false, REMOTE_FRAME, 0, &test_frame);
+    framer(0x0672, 0xAAAAAAAAAAAAAAAA, false, DATA_FRAME, 8, &test_frame);
+    // framer(0x0672, 0x0, false, DATA_FRAME, 0, &test_frame);
+    // framer(0x0672, 0x0, false, REMOTE_FRAME, 0, &test_frame); // CRC?
+    // framer(0x0672, 0x0, false, REMOTE_FRAME, 1, &test_frame);
+    // framer(test_id, 0xAAAAAAAAAAAAAAAA, true, DATA_FRAME, 8, &test_frame);
+    // framer(test_id, 0x0, true, REMOTE_FRAME, 0, &test_frame);
+    // framer(0x7FF, 0, false, REMOTE_FRAME, 0, &test_frame);
+    // print_frame(test_frame, false);
+    Serial.println(F("Frame data: "));
+    print_array(in_frame.data, in_frame.frame_size - 1);
+    Serial.println(F("-----------------------------------------------------"));
+    // Serial.println();
+    // print_array(test_frame.data, test_frame.frame_size - 1);
+    // Serial.println(test_frame.frame_size);
+    // End Testing
 }
 
 void debug(){

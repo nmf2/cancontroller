@@ -18,6 +18,8 @@ void p(const char *fmt, ... ){
 
 void printb(bool bit){ printf("%d|", bit); }
 
+short build_crc(bool *array, int begin, int end);
+
 int framer(uint64_t id, unsigned long long int payload, bool extended, bool type, 
            int payload_size, Frame *frm){
     if(writing_mode){
@@ -166,15 +168,16 @@ int framer(uint64_t id, unsigned long long int payload, bool extended, bool type
     }
     
     // CRC
-    //printf("CRC: |");
-    for (i = start_crc, j = 0; i <= end_crc; i++, j++){
-        frm->data[i] = 0;
-        printb(frm->data[i]);
-        if((end_crc - i) < 4){
-            frm->data[i] = 1;
-        }
+    
+    unsigned short crc_value = build_crc(frm->data, 0, start_crc - 1);
+    Serial.print("crc_value: ");
+    Serial.println(crc_value);
+    Serial.print("CRC: ");
+    for (i = start_crc, j = 15; i <= end_crc; i++, j--){
+        frm->data[i] = (crc_value >> j) & 1;
+        Serial.print(frm->data[i]);
     }
-    //printf("\n");
+    Serial.println();
     
     //CRCd
     frm->data[crcd] = 1;
@@ -198,6 +201,16 @@ int framer(uint64_t id, unsigned long long int payload, bool extended, bool type
     set_in_frame(*frm);
     
     return 0; // Ok
+}
+
+short build_crc(bool *array, int begin, int end){
+    short crc_tmp = 0, i;
+    
+    for (i = begin; i <= end; i++){
+        crc_tmp = next_crc(crc_tmp, array[i]);
+    }
+
+    return crc_tmp;
 }
 
 // int main(){
