@@ -3,6 +3,7 @@
 #include "../include/interface.h"
 
 #define SECOND 1000000 // 1 second
+#define MILLI 1000
 
 #define PIN_SP_TEST 12
 
@@ -21,7 +22,7 @@ void debug();
 void setup() {
     Serial.begin(9600);
     //delay(500);
-    Timer1.initialize(SECOND/20);
+    Timer1.initialize(MILLI);
     Timer1.attachInterrupt(test_sp);
     state = IDLE;
     Rx = 1;
@@ -60,9 +61,6 @@ void loop() {
         stuffer(); // Responsible for writing.
         Rx = Tx;
         wp = false;
-        //Serial.println(F("SP"));
-        //Rx = digitalRead(PIN_SP_TEST);
-        //Rx = !Rx; // Make recessive the default
         
         bit_stuff_monitor(); // Reading
         
@@ -72,7 +70,7 @@ void loop() {
         //ack_checker(); 
         form_checker();
         bit_monitor();
-        
+
         err = stuff_err | ack_err | bit_err | form_err | crc_err;
 
         debug();
@@ -96,22 +94,22 @@ void print_array(bool *array, int max){
 }
 
 void debug(){
-    Serial.print("State: ");
-    Serial.print(state_str(last_state));
-    Serial.print("; Rx: ");
-    Serial.print(Rx);
-    Serial.print("; Tx: ");
-    Serial.print(Tx);
-    Serial.print("; bit_index: ");
-    Serial.print(bit_index);
-    Serial.print("; frm_index: ");
-    Serial.print(frm_index);
-    Serial.print("; DLC: ");
-    Serial.print(DLC_value);
-    Serial.print("; Rstuff_flag: ");
-    Serial.print(Rstuff_flag);
-    Serial.print("; Tstuff_flag: ");
-    Serial.print(Tstuff_flag);
+    // Serial.print("State: ");
+    // Serial.print(state_str(last_state));
+    // Serial.print("; Rx: ");
+    // Serial.print(Rx);
+    // Serial.print("; Tx: ");
+    // Serial.print(Tx);
+    // Serial.print("; bit_index: ");
+    // Serial.print(bit_index);
+    // Serial.print("; frm_index: ");
+    // Serial.print(frm_index);
+    // Serial.print("; DLC: ");
+    // Serial.print(DLC_value);
+    // Serial.print("; Rstuff_flag: ");
+    // Serial.print(Rstuff_flag);
+    // Serial.print("; Tstuff_flag: ");
+    // Serial.print(Tstuff_flag);
     // Serial.print("; Sbit_count: ");
     // Serial.print(Sbit_count);
     // Serial.print("; writing_mode: ");
@@ -120,16 +118,16 @@ void debug(){
     // Serial.print(eol_recessive_count);
     // Serial.print("; eol_dominant_count: ");
     // Serial.print(eol_dominant_count);
-    Serial.println();
+    // Serial.println();
 
-    Serial.print("form_err: ");
-    Serial.print(form_err);
-    Serial.print("; ack_err: ");
-    Serial.print(ack_err);
-    Serial.print("; bit_err: ");
-    Serial.print(bit_err);
-    Serial.print("; stuff_err: ");
-    Serial.print(stuff_err);
+    // Serial.print("form_err: ");
+    // Serial.print(form_err);
+    // Serial.print("; ack_err: ");
+    // Serial.print(ack_err);
+    // Serial.print("; bit_err: ");
+    // Serial.print(bit_err);
+    // Serial.print("; stuff_err: ");
+    // Serial.print(stuff_err);
     // Serial.print("; bsm_bit_count: ");
     // Serial.print(bsm_bit_count);
     // Serial.print("; bsm_last_bit: ");
