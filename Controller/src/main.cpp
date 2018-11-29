@@ -20,31 +20,35 @@ void debug();
 
 void setup() {
     Serial.begin(9600);
-    Timer1.initialize(SECOND/15);
+    //delay(500);
+    Timer1.initialize(SECOND/20);
     Timer1.attachInterrupt(test_sp);
     state = IDLE;
     Rx = 1;
 
-    Serial.println("BEGIN");
+    Serial.println(F("BEGIN"));
     Serial.println();
     
-    pinMode(PIN_SP_TEST, INPUT_PULLUP);
+    //pinMode(PIN_SP_TEST, INPUT_PULLUP);
     
     //Testing  
     Frame test_frame;
-
-    test_frame.type = DATA_FRAME;
-    test_frame.extended = false;
-    test_frame.payload_size = 0;
-
+    uint64_t test_id = id_calc(0x0449,0x3007A);
     // Frames tested
     // framer(0x7FF, 0, false, REMOTE_FRAME, 0, &test_frame);
     // framer(0x0672, 0xAAAAAAAAAAAAAAAA, false, DATA_FRAME, 8, &test_frame);
-    framer(0x0672, 0x0, false, DATA_FRAME, 0, &test_frame);
+    // framer(0x0672, 0x0, false, DATA_FRAME, 0, &test_frame);
+    // framer(0x0672, 0x0, false, REMOTE_FRAME, 0, &test_frame); // CRC?
+    // framer(0x0672, 0x0, false, REMOTE_FRAME, 1, &test_frame);
+    // framer(test_id, 0xAAAAAAAAAAAAAAAA, true, DATA_FRAME, 8, &test_frame);
+    // framer(test_id, 0x0, true, REMOTE_FRAME, 0, &test_frame);
+    framer(0x7FF, 0, false, REMOTE_FRAME, 0, &test_frame);
 
     print_frame(test_frame, false);
-    Serial.println("Frame data: ");
+    Serial.println(F("Frame data: "));
     print_array(in_frame.data, in_frame.frame_size - 1);
+    Serial.println(F("-----------------------------------------------------"));
+    Serial.println();
     // print_array(test_frame.data, test_frame.frame_size - 1);
     // Serial.println(test_frame.frame_size);
     //End Testing
@@ -52,11 +56,11 @@ void setup() {
 }
 void loop() {
     if(sp == true){
-        Serial.println("WP");
+        //Serial.println(F("WP"));
         stuffer(); // Responsible for writing.
         Rx = Tx;
         wp = false;
-        Serial.println("SP");
+        //Serial.println(F("SP"));
         //Rx = digitalRead(PIN_SP_TEST);
         //Rx = !Rx; // Make recessive the default
         
@@ -108,15 +112,17 @@ void debug(){
     Serial.print(Rstuff_flag);
     Serial.print("; Tstuff_flag: ");
     Serial.print(Tstuff_flag);
-    Serial.print("; Sbit_count: ");
-    Serial.print(Sbit_count);
-    Serial.print("; eol_recessive_count: ");
-    Serial.print(eol_recessive_count);
-    Serial.print("; eol_dominant_count: ");
-    Serial.print(eol_dominant_count);
+    // Serial.print("; Sbit_count: ");
+    // Serial.print(Sbit_count);
+    // Serial.print("; writing_mode: ");
+    // Serial.print(writing_mode);
+    // Serial.print("; eol_recessive_count: ");
+    // Serial.print(eol_recessive_count);
+    // Serial.print("; eol_dominant_count: ");
+    // Serial.print(eol_dominant_count);
     Serial.println();
 
-    Serial.print("; form_err: ");
+    Serial.print("form_err: ");
     Serial.print(form_err);
     Serial.print("; ack_err: ");
     Serial.print(ack_err);
@@ -124,15 +130,15 @@ void debug(){
     Serial.print(bit_err);
     Serial.print("; stuff_err: ");
     Serial.print(stuff_err);
-    Serial.print("; bsm_bit_count: ");
-    Serial.print(bsm_bit_count);
-    Serial.print("; bsm_last_bit: ");
-    Serial.print(bsm_last_bit);
-    
+    // Serial.print("; bsm_bit_count: ");
+    // Serial.print(bsm_bit_count);
+    // Serial.print("; bsm_last_bit: ");
+    // Serial.print(bsm_last_bit);
     Serial.println();
-
+    
+    Serial.println(F("Frame data: "));
     print_array(frame.data, bit_index);
-    Serial.println("Bus data: ");
+    Serial.println(F("Bus data: "));
     print_array(bus_data, bdi);
     // Serial.println();
     // Serial.print("test_Frame_size: ");

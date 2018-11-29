@@ -113,3 +113,6 @@ void print_frame(Frame frm, bool use_printf){
     
 }
 
+unsigned long long id_calc(unsigned long long id1,unsigned long long id2){
+    return (id1 << 18) | id2;
+}

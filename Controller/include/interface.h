@@ -1,3 +1,4 @@
+#include <Arduino.h>
 // Data Frame (up to the start of the data frame)
 #ifndef _CAN_PARAMS // Prevents double include errors
 #define _CAN_PARAMS
@@ -88,7 +89,7 @@ void print_array(bool *array, int max);
 void frame_walker(); 
 
 //framer.cpp
-int framer(int id, unsigned long long payload, bool extended, bool type, 
+int framer(uint64_t id, unsigned long long payload, bool extended, bool type, 
             int payload_size, Frame *frm);  
 
 // util.cpp
@@ -96,6 +97,7 @@ int bits_to_int(int start, int end, bool * data);
 int int_to_bits(unsigned long long value, bool * array, int fixed_size);
 void printf_arr(bool* array, int end_index);
 void print_frame(Frame, bool);
+unsigned long long id_calc(unsigned long long id1,unsigned long long id2);
 
 // stuffer.cpp
 void stuffer(); // Takes care of bit stuffing
