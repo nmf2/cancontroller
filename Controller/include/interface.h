@@ -80,15 +80,22 @@ static inline const char *state_str(State s)
 }
 
 /********************* Functions *********************/
+
+//main.cpp
+void print_array(bool *array, int max);
+
 //frame_walker.cpp
 void frame_walker(); 
 
 //framer.cpp
-int framer(bool *id, bool *payload, Frame *frm); 
+void framer(int id, unsigned long long payload, bool extended, bool type, 
+            int payload_size, Frame *frm);  
 
 // util.cpp
 int bits_to_int(int start, int end, bool * data);
-int int_to_bits(int value, bool * array);
+int int_to_bits(unsigned long long value, bool * array, int fixed_size);
+void printf_arr(bool* array, int end_index);
+void print_frame(Frame);
 
 // stuffer.cpp
 void stuffer(); // Takes care of bit stuffing
@@ -110,8 +117,8 @@ void ack_checker();
 extern Frame frame;
 extern State state;
 extern State last_state;
-extern bool wp;
-extern bool sp;
+extern bool volatile wp;
+extern bool volatile sp;
 extern bool Rx;
 extern bool err;
 
@@ -158,13 +165,14 @@ extern bool crc_err;
 extern int eol_dominant_count;
 extern int eol_recessive_count;
 
-extern int bsm_bit_count;
 extern bool bsm_last_bit;
 
 extern Frame in_frame;
 
 extern bool Tstuff_flag;
 
+extern int bsm_bit_count;
 extern int Sbit_count;
+
 
 #endif

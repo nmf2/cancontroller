@@ -20,13 +20,11 @@ void bit_stuff_monitor(){
         if (Rstuff_flag == true){
             Rstuff_flag = false;
         }
-        
         if (bsm_bit_count == 6){
             stuff_err = true;
             bsm_bit_count = 1;
         }
-
-        if (bsm_bit_count >= 5){
+        else if (bsm_bit_count == 5){
             Rstuff_flag = true;
         } 
         if (bsm_last_bit == Rx){
@@ -37,5 +35,9 @@ void bit_stuff_monitor(){
         }
         
         bsm_last_bit = Rx;
+    }
+    else {
+        bsm_bit_count = 1;
+        Rstuff_flag = false;
     }
 }

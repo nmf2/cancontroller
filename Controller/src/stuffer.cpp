@@ -8,6 +8,7 @@ int frm_index = 0; // Equivalent to bit_index in Frame Walker
 bool wait_next_frame = 0; // activated when lost arbitration
 bool writing_mode = 0; // Indicates if it's currently writing a frame;
 bool last_Tx;
+int error_dominant_count = 0;
 
 void stuffer(){
     if (wp == false){
@@ -30,16 +31,24 @@ void stuffer(){
         Sbit_count = 1;
     }
     else if (state == ERROR_FLAG){
-        Tx = 0;
+        if(error_dominant_count <= 6){
+            Tx = 0;
+        } 
+        else {
+            Tx = 1;
+        }
+        error_dominant_count++;
     }
     else if (state == ERROR_DELIMITER){
-        Tx = 1; 
+        error_dominant_count = 0;
+        Tx = 1;
     }
     else if (writing_mode){ // if there is anything to write
         Tx = in_frame.data[frm_index];
         
         if (state < CRCd){
             if (last_Tx == Tx){
+                // Last bit equals current one
                 Sbit_count++;
             } else {
                 Sbit_count = 1;
@@ -47,6 +56,11 @@ void stuffer(){
             if(Sbit_count == 5){
                 Tstuff_flag = true;
             }
+
+        } 
+        else { // After CRCd, reset;
+            Sbit_count = 1;
+            Tstuff_flag = false;
         }
         frm_index++;
         if (frm_index >= in_frame.frame_size){ //finished writing
