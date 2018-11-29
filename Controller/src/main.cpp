@@ -11,43 +11,45 @@ bool volatile sp;
 bool volatile wp;
 bool Rx; // Data from transceiver
 
-
-bool err = false; // Error Flag 
+bool err = false; // Error Flag
 
 void test_sp();
 void debug();
 
-Frame test_frame;
+//Frame test_frame;
 
 void setup() {
     Serial.begin(9600);
-    Timer1.initialize(2*SECOND);
+    Timer1.initialize(SECOND/15);
     Timer1.attachInterrupt(test_sp);
+    state = IDLE;
+    Rx = 1;
+
+    Serial.println("BEGIN");
+    Serial.println();
     
     pinMode(PIN_SP_TEST, INPUT_PULLUP);
     
-    // Testing  
+    //Testing  
     Frame test_frame;
-    bool id[11] = { 0 };
 
     test_frame.type = DATA_FRAME;
     test_frame.extended = false;
     test_frame.payload_size = 0;
-    test_frame.frame_size = 45;
 
-    //framer(id, nullptr, &test_frame);
-    // set_in_frame(test_frame);
-    // Serial.print("test_Frame_size: ");
-    // Serial.println(test_frame.frame_size);
-    // print_array(in_frame.data, in_frame.frame_size - 1);
+    // Frames tested
+    // framer(0x7FF, 0, false, REMOTE_FRAME, 0, &test_frame);
+    // framer(0x0672, 0xAAAAAAAAAAAAAAAA, false, DATA_FRAME, 8, &test_frame);
+    framer(0x0672, 0x0, false, DATA_FRAME, 0, &test_frame);
+
+    print_frame(test_frame, false);
+    Serial.println("Frame data: ");
+    print_array(in_frame.data, in_frame.frame_size - 1);
     // print_array(test_frame.data, test_frame.frame_size - 1);
-    // Serial.print("in_frame: ");
     // Serial.println(test_frame.frame_size);
-    // print_array(test_frame.data, test_frame.frame_size - 1);
     //End Testing
 
 }
-
 void loop() {
     if(sp == true){
         Serial.println("WP");
@@ -80,11 +82,11 @@ void test_sp(){
 }
 
 void print_array(bool *array, int max){
-    Serial.print("|");
+    //Serial.print("|");
     int i = 0;
     for (; i <= max; i++){
         Serial.print(array[i]);
-        Serial.print("|");
+        //Serial.print("|");
     }
     Serial.println();
 }
@@ -98,28 +100,30 @@ void debug(){
     Serial.print(Tx);
     Serial.print("; bit_index: ");
     Serial.print(bit_index);
-    // Serial.print("; DLC: ");
-    // Serial.print(DLC_value);
+    Serial.print("; frm_index: ");
+    Serial.print(frm_index);
+    Serial.print("; DLC: ");
+    Serial.print(DLC_value);
     Serial.print("; Rstuff_flag: ");
     Serial.print(Rstuff_flag);
     Serial.print("; Tstuff_flag: ");
     Serial.print(Tstuff_flag);
     Serial.print("; Sbit_count: ");
     Serial.print(Sbit_count);
-    // Serial.print("; eol_recessive_count: ");
-    // Serial.print(eol_recessive_count);
-    // Serial.print("; eol_dominant_count: ");
-    // Serial.print(eol_dominant_count);
+    Serial.print("; eol_recessive_count: ");
+    Serial.print(eol_recessive_count);
+    Serial.print("; eol_dominant_count: ");
+    Serial.print(eol_dominant_count);
     Serial.println();
 
-    // Serial.print("; form_err: ");
-    // Serial.print(form_err);
-    // Serial.print("; ack_err: ");
-    // Serial.print(ack_err);
-    // Serial.print("; bit_err: ");
-    // Serial.print(bit_err);
-    // Serial.print("; stuff_err: ");
-    // Serial.print(stuff_err);
+    Serial.print("; form_err: ");
+    Serial.print(form_err);
+    Serial.print("; ack_err: ");
+    Serial.print(ack_err);
+    Serial.print("; bit_err: ");
+    Serial.print(bit_err);
+    Serial.print("; stuff_err: ");
+    Serial.print(stuff_err);
     Serial.print("; bsm_bit_count: ");
     Serial.print(bsm_bit_count);
     Serial.print("; bsm_last_bit: ");
@@ -128,6 +132,8 @@ void debug(){
     Serial.println();
 
     print_array(frame.data, bit_index);
+    Serial.println("Bus data: ");
+    print_array(bus_data, bdi);
     // Serial.println();
     // Serial.print("test_Frame_size: ");
     // Serial.println(test_frame.frame_size);

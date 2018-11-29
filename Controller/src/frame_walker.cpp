@@ -16,6 +16,8 @@ int idle_bus = 1; // Bus-is-idle flag
 int DLC_value = 0; // Integer value of the DLC field.
 int eol_recessive_count = 0;
 int eol_dominant_count = 0;
+bool bus_data[300] = { 0 };
+int bdi = 0;
 
 // Dynamic bit indexes 
 int BIT_START_DLC_X,
@@ -40,6 +42,7 @@ int min(int a, int b){
 
 void frame_walker(){
     if (Rstuff_flag == true || sp == 0){ // Simply return
+        bus_data[bdi++] = Rx;
         return;
     }
     if (err == true){
@@ -48,10 +51,10 @@ void frame_walker(){
     else if (state < INTERMISSION1){
         bit_index++; // Simply go to the next bit
         frame.data[bit_index] = Rx; // take data in
+        bus_data[bdi++] = Rx;
     }
     
     last_state = state; // This state will be the last after this runs
-
     switch(state){
         case IDA:
             if (bit_index == BIT_END_ID_A){ // this is the last bit of the IDA
@@ -195,6 +198,7 @@ void frame_walker(){
                 frame.data[0] = 0;
                 DLC_value = 0;
                 state = IDA;
+                bdi = 0;
             }
             break;
         
@@ -229,4 +233,5 @@ void frame_walker(){
             }
             break;
     }
+
 }

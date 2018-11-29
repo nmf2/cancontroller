@@ -88,14 +88,14 @@ void print_array(bool *array, int max);
 void frame_walker(); 
 
 //framer.cpp
-void framer(int id, unsigned long long payload, bool extended, bool type, 
+int framer(int id, unsigned long long payload, bool extended, bool type, 
             int payload_size, Frame *frm);  
 
 // util.cpp
 int bits_to_int(int start, int end, bool * data);
 int int_to_bits(unsigned long long value, bool * array, int fixed_size);
 void printf_arr(bool* array, int end_index);
-void print_frame(Frame);
+void print_frame(Frame, bool);
 
 // stuffer.cpp
 void stuffer(); // Takes care of bit stuffing
@@ -173,6 +173,10 @@ extern bool Tstuff_flag;
 
 extern int bsm_bit_count;
 extern int Sbit_count;
+
+extern int frm_index;
+extern bool bus_data[300];
+extern int bdi;
 
 
 #endif

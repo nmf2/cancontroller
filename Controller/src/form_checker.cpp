@@ -58,7 +58,7 @@ void form_checker(){
         // Dominant bit in any of the first two bits of Intermission
         case INTERMISSION1:                                         //(Checked)
             if(Rx == 0){
-                state = ERROR_FLAG;
+                form_err = true;
             }
             break;
 

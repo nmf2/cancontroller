@@ -1,3 +1,4 @@
+#include <Arduino.h>
 #include <stdbool.h>
 #include "../include/interface.h"
 #include <stdio.h>
@@ -69,12 +70,26 @@ void pfd(bool *array, int begin, int end){
     printf("Dec: %lld\n\n", value);
 }
 
-void print_frame(Frame frm){
-    printf("Attributes:\n");
-    printf("Extended: %s\n", frm.extended ? "Yes" : "No");
-    printf("Type: %s\n", frm.type ? "REMOTE" : "DATA");
-    printf("Frame size: %d\n", frm.frame_size);
-    printf("Payload size: %d bytes\n\n", frm.payload_size);
+void print_frame(Frame frm, bool use_printf){
+    if (use_printf){
+        printf("Attributes:\n");
+        printf("Extended: %s\n", frm.extended ? "Yes" : "No");
+        printf("Type: %s\n", frm.type ? "REMOTE" : "DATA");
+        printf("Frame size: %d\n", frm.frame_size);
+        printf("Payload size: %d bytes\n\n", frm.payload_size);
+    } else{
+        Serial.print("Attributes: ");
+        Serial.print("Extended: ");
+        Serial.println(frm.extended ? "Yes" : "No");
+        Serial.print("Type: ");
+        Serial.println(frm.type ? "REMOTE" : "DATA");
+        Serial.print("Frame size: ");
+        Serial.println(frm.frame_size);
+        Serial.print("Payload size: ");
+        Serial.println(frm.payload_size);
+        Serial.println(); 
+        Serial.println();
+    }
 
     // printf("IDA");
     // pfd(frm.data, BIT_START_ID_A, BIT_END_ID_A);

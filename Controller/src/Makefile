@@ -1,3 +1,3 @@
 framer:
-	g++ framer.cpp util.cpp
+	g++ framer.cpp util.cpp 
 	./a.out
