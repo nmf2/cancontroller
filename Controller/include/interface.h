@@ -69,6 +69,15 @@ enum State {IDA, RTRA_SRR, IDE, r0, IDB, RTRB, r1_r0, DLC, PAYLOAD,
 State;
 
 /********************* Functions *********************/
+static inline const char *state_str(State s){
+    static const char *strings[] = {
+        "IDA", "RTRA_SRR", "IDE", "r0", "IDB", "RTRB", "r1_r0", "DLC", 
+        "PAYLOAD", "CRC", "CRCd", "ACK", "ACKd", "EOFR", "INTERMISSION1", 
+        "INTERMISSION2", "ERROR_FLAG", "ERROR_DELIMITER", "IDLE"
+    };
+
+    return strings[s];
+}
 //main.cpp
 void print_array(bool *array, int max);
 
@@ -86,7 +95,6 @@ void print_array(bool *array, int max);
 void printf_arr(bool *array, int end_index);
 void print_frame(Frame, bool);
 uint64_t id_calc(uint64_t id1, uint64_t id2);
-static inline const char *state_str(State s);
 short next_crc(short crc_rg, bool nxt_bit);
 
 // stuffer.cpp
@@ -105,6 +113,9 @@ void form_checker();
 // ack_checker.cpp
 void ack_checker();
 
+// crc_checker.cpp
+void crc_checker();
+
 /**************** Global Variables ****************/
 extern Frame frame;
 extern State state;
@@ -113,7 +124,6 @@ extern bool volatile wp;
 extern bool volatile sp;
 extern bool Rx;
 extern bool err;
-
 
 /**************** Frame Walker Vars ****************/
 extern int bit_index;

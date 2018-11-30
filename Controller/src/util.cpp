@@ -66,21 +66,12 @@ void printf_arr(bool *array, int end_index){
     printf("\n");
 }
 
-static inline const char *state_str(State s)
-{
-    static const char *strings[] = {
-        "IDA", "RTRA_SRR", "IDE", "r0", "IDB", "RTRB", "r1_r0", "DLC", 
-        "PAYLOAD", "CRC", "CRCd", "ACK", "ACKd", "EOFR", "INTERMISSION1", 
-        "INTERMISSION2", "ERROR_FLAG", "ERROR_DELIMITER", "IDLE"
-    };
 
-    return strings[s];
-}
 
 short next_crc(short crc_rg, bool nxt_bit){
-    bool crc_rg_15th = ((crc_rg >> 15) & 1); // crc_rg's fifteenth bit
-    bool crc_nxt = nxt_bit ^ crc_rg_15th;
-    crc_rg = crc_rg << 1;  // Shift left by 1 position
+    bool crc_rg_15th = (crc_rg >> 14) & 0x01; // crc_rg's fifteenth bit
+    bool crc_nxt = (nxt_bit ^ crc_rg_15th) != 0;
+    crc_rg = (crc_rg << 1) & 0x7FFF ;  // Shift left by 1 position
     if (crc_nxt){
         crc_rg = crc_rg ^ 0x4599;
     }

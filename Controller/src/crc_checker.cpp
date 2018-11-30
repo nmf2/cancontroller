@@ -13,20 +13,27 @@ void crc_checker(){
     if (Rstuff_flag){
         return;
     }
+    if (crc_err == true){
+        crc_err = false;
+        crc = 0 ^ 0; // SOF
+    }
     if (last_state < CRC){
         crc = next_crc(crc, Rx);
     }
     else if (last_state == ACKd){ // Decide if there is an error
         // Get frame's CRC
-        short frame_crc = (short) bits_to_int(BIT_START_DLC_X, 
-                                              BIT_END_DLC_X, 
+        short frame_crc = (short) bits_to_int(BIT_Y_START_CRC_X, 
+                                              BIT_Y_END_CRC_X, 
                                               frame.data);
-
+        Serial.print("crc: ");
+        Serial.println(crc);
+        Serial.print("frame_crc: ");
+        Serial.println(frame_crc);
         if(frame_crc != crc){
             crc_err = true;
         }
     }
-    else if ( state > ACKd){
+    else if ( last_state > ACKd){
         crc = 0 ^ 0; //Already prepare for SOF
     }
 }

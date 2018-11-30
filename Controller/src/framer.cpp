@@ -173,7 +173,7 @@ int framer(uint64_t id, unsigned long long int payload, bool extended, bool type
     Serial.print("crc_value: ");
     Serial.println(crc_value);
     Serial.print("CRC: ");
-    for (i = start_crc, j = 15; i <= end_crc; i++, j--){
+    for (i = start_crc, j = 14; i <= end_crc; i++, j--){
         frm->data[i] = (crc_value >> j) & 1;
         Serial.print(frm->data[i]);
     }

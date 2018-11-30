@@ -36,11 +36,9 @@ using namespace std;
 //          000111110101110 (destuffed)
 //res:      000111110101110
 
-bool exor(bool x,bool y){
+bool exor(bool x,  bool y){
     return (x && !y) || (!x && y);
 }
-
-
 
 bool frame[128];
 bool CRC[15];

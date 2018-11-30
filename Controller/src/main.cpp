@@ -23,7 +23,7 @@ void testing();
 void setup() {
     Serial.begin(9600);
 
-    Timer1.initialize(10*SECOND);
+    Timer1.initialize(SECOND/20);
     Timer1.attachInterrupt(test_sp);
     
     //pinMode(PIN_SP_TEST, INPUT_PULLUP);
@@ -48,6 +48,7 @@ void loop() {
         // ack_checker(); 
         form_checker();
         bit_monitor();
+        crc_checker();
 
         err = stuff_err | ack_err | bit_err | form_err | crc_err;
 
@@ -62,23 +63,21 @@ void test_sp(){
     wp = true;
 }
 
-
-
 void testing(){
     //Testing  
     Frame test_frame;
     uint64_t test_id = id_calc(0x0449,0x3007A);
     // Frames tested
-    // framer(0x7FF, 0, false, REMOTE_FRAME, 0, &test_frame);
-    framer(0x0672, 0xAAAAAAAAAAAAAAAA, false, DATA_FRAME, 8, &test_frame);
+    framer(0x0672, 0, false, DATA_FRAME, 0, &test_frame);
+    // framer(0x0672, 0xAAAAAAAAAAAAAAAA, false, DATA_FRAME, 8, &test_frame);
     // framer(0x0672, 0x0, false, DATA_FRAME, 0, &test_frame);
     // framer(0x0672, 0x0, false, REMOTE_FRAME, 0, &test_frame); // CRC?
     // framer(0x0672, 0x0, false, REMOTE_FRAME, 1, &test_frame);
     // framer(test_id, 0xAAAAAAAAAAAAAAAA, true, DATA_FRAME, 8, &test_frame);
     // framer(test_id, 0x0, true, REMOTE_FRAME, 0, &test_frame);
-    // framer(0x7FF, 0, false, REMOTE_FRAME, 0, &test_frame);
     // print_frame(test_frame, false);
-    Serial.println(F("Frame data: "));
+
+    Serial.println(F("Frame data: "));  
     print_array(in_frame.data, in_frame.frame_size - 1);
     Serial.println(F("-----------------------------------------------------"));
     // Serial.println();
@@ -88,22 +87,22 @@ void testing(){
 }
 
 void debug(){
-    // Serial.print("State: ");
-    // Serial.print(state_str(last_state));
-    // Serial.print("; Rx: ");
-    // Serial.print(Rx);
-    // Serial.print("; Tx: ");
-    // Serial.print(Tx);
-    // Serial.print("; bit_index: ");
-    // Serial.print(bit_index);
+    Serial.print("State: ");
+    Serial.print(state_str(last_state));
+    Serial.print("; Rx: ");
+    Serial.print(Rx);
+    Serial.print("; Tx: ");
+    Serial.print(Tx);
+    Serial.print("; bit_index: ");
+    Serial.print(bit_index);
     // Serial.print("; frm_index: ");
     // Serial.print(frm_index);
     // Serial.print("; DLC: ");
     // Serial.print(DLC_value);
-    // Serial.print("; Rstuff_flag: ");
-    // Serial.print(Rstuff_flag);
-    // Serial.print("; Tstuff_flag: ");
-    // Serial.print(Tstuff_flag);
+    Serial.print("; Rstuff_flag: ");
+    Serial.print(Rstuff_flag);
+    Serial.print("; Tstuff_flag: ");
+    Serial.print(Tstuff_flag);
     // Serial.print("; Sbit_count: ");
     // Serial.print(Sbit_count);
     // Serial.print("; writing_mode: ");
@@ -112,7 +111,7 @@ void debug(){
     // Serial.print(eol_recessive_count);
     // Serial.print("; eol_dominant_count: ");
     // Serial.print(eol_dominant_count);
-    // Serial.println();
+    Serial.println();
 
     // Serial.print("form_err: ");
     // Serial.print(form_err);
@@ -122,6 +121,8 @@ void debug(){
     // Serial.print(bit_err);
     // Serial.print("; stuff_err: ");
     // Serial.print(stuff_err);
+    Serial.print("; crc_err: ");
+    Serial.print(crc_err);
     // Serial.print("; bsm_bit_count: ");
     // Serial.print(bsm_bit_count);
     // Serial.print("; bsm_last_bit: ");
