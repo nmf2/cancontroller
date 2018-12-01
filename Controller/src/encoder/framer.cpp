@@ -1,22 +1,20 @@
 
 #include <Arduino.h>
-#include "../include/interface.h"
+#include "interface.h"
 #include "stdbool.h"
-#include "stdio.h"
-#include <stdarg.h> 
+// #include "stdio.h"
+// #include <stdarg.h> 
 
-void p(const char *fmt, ... ){
-    char buf[128]; // resulting string limited to 128 chars
-    va_list args;
-    va_start (args, fmt );
-    vsnprintf(buf, 128, fmt, args);
-    va_end (args);
-    Serial.print(buf);
-}
+// void p(const char *fmt, ... ){
+//     char buf[128]; // resulting string limited to 128 chars
+//     va_list args;
+//     va_start (args, fmt );
+//     vsnprintf(buf, 128, fmt, args);
+//     va_end (args);
+//     Serial.print(buf);
+// }
 
-#define LOG 0
-
-void printb(bool bit){ printf("%d|", bit); }
+//// void printb(bool bit){ printf("%d|", bit); }
 
 short build_crc(bool *array, int begin, int end);
 
@@ -76,7 +74,7 @@ int framer(uint64_t id, unsigned long long int payload, bool extended, bool type
         //printf("IDB: |");
         for(i = BIT_START_ID_B, j = 11; i <= BIT_END_ID_B; i++, j++){
             frm->data[i] = id_arr[j];
-            printb(frm->data[i]);
+            //printb(frm->data[i]);
         }
         //printf("\n");
         rtr = BIT_RTR_B;
@@ -138,7 +136,7 @@ int framer(uint64_t id, unsigned long long int payload, bool extended, bool type
     //printf("IDA: |");
     for (i = BIT_START_ID_A, j = 0; i <= BIT_END_ID_A; i++, j++){
         frm->data[i] = id_arr[j];
-        printb(frm->data[i]);
+        //printb(frm->data[i]);
     }
     //printf("\n");
 
@@ -150,7 +148,7 @@ int framer(uint64_t id, unsigned long long int payload, bool extended, bool type
     print_array(dlc_arr, 3);
     for (i = start_dlc, j = 0; i <= end_dlc; i++, j++){
         frm->data[i] = dlc_arr[j];
-        printb(frm->data[i]);
+        //printb(frm->data[i]);
     }
     //printf("\n");
 
@@ -162,7 +160,7 @@ int framer(uint64_t id, unsigned long long int payload, bool extended, bool type
 
         for (i = start_payload, j = 0; i <= end_payload; i++, j++){
             frm->data[i] = payload_arr[j];
-            printb(frm->data[i]);
+            //printb(frm->data[i]);
         }
         //printf("\n");
     }
@@ -192,7 +190,7 @@ int framer(uint64_t id, unsigned long long int payload, bool extended, bool type
     //printf("EOF: |");
     for (i = start_eof; i <= end_eof; i++){
         frm->data[i] = 1;
-        printb(frm->data[i]);
+        //printb(frm->data[i]);
     }
     //printf("\n");
 

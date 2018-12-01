@@ -122,14 +122,13 @@ void crc_checker();
 extern Frame frame;
 extern State state;
 extern State last_state;
-extern bool volatile wp;
-extern bool volatile sp;
 extern bool Rx;
 extern bool err;
 
 /**************** Frame Walker Vars ****************/
 extern int bit_index;
 extern int DLC_value;
+extern bool idle_bus;
 
 extern int BIT_START_DLC_X,
             BIT_END_DLC_X,

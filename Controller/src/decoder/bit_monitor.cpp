@@ -1,14 +1,12 @@
 #include "stdbool.h"
-#include "../include/interface.h"
+#include "interface.h"
+#include "BTL.h"
 
 bool lost_arbitration;
 bool bit_err;
 // int arbitration_state = IDE;
 
 void bit_monitor(){
-    if (sp == false){
-        return; 
-    }
     if (bit_err == true){
         bit_err = false;
     }

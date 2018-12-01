@@ -1,5 +1,5 @@
 #include "stdbool.h"
-#include "../include/interface.h"
+#include "interface.h"
 /*
 * Whenever a CRC ERROR is detected, transmission of an ERROR FLAG starts at the 
 * bit following the ACK DELIMITER, unless an ERROR FLAG for another condition 

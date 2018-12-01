@@ -1,6 +1,7 @@
 #include <Arduino.h>
 #include <TimerOne.h>
-#include "../include/interface.h"
+#include "interface.h"
+#include "BTL.h"
 
 #define SECOND 1000000 // 1 second
 #define MILLI 1000
@@ -8,8 +9,6 @@
 #define PIN_SP_TEST 12
 
 //Defining these here FOR NOW, should be defined in BTL module
-bool volatile sp; 
-bool volatile wp;
 bool Rx; // Data from transceiver
 
 bool err = false; // Error Flag
@@ -22,16 +21,40 @@ int counter = 10;
 
 int i = 0;
 
-const char input[]  =   "0110011100100000100110101010110011100001010101111111100000011111111x";
-const char input2[] =   "0110011100100000100110101010110011100001010101111111100000011111111x";
+// const char input[]  =   "0110011100100000100110101010110011100001010101111111100000011111111x";
+// const char input2[] =   "0110011100100000100110101010110011100001010101111111100000011111111x";
 
 //Frame test_frame;
 
+//Transceiver IO
+#define PIN_RX 2 //Rx from transceiver 
+#define PIN_TX 3 //Tx from transceiver
+
 void setup() {
     Serial.begin(9600);
+    //Initializing Arduino IOs   
+    pinMode(PIN_RX, INPUT);
+    pinMode(PIN_TX, OUTPUT);
 
-    Timer1.initialize(SECOND/100);
-    Timer1.attachInterrupt(test_sp);
+    //Initializing Bit Timing Logic 
+    BTL_init();
+    //Initializing Can Controller
+    CCL_init();
+    //Initializing TOGGLE
+    TOGGLE_init();
+
+    //Initializing Timer1 Interrupt
+    Timer1.initialize(BTL_TIME_QUANTA);
+
+    //Attaching Interrupts
+    //call BTL_edge_detector when a falling edge is detected at PIN_RX
+    //BTL_edge_detector: sets a flag called rx_falling which is used by
+    //the bit timing state machine to handle synchronizations
+    attachInterrupt(digitalPinToInterrupt(PIN_RX), BTL_edge_detector, FALLING);
+    //call BTL_new_time_quanta after Timer1 trigger its interruption.
+    //BTL_new_time_quanta: sets a flag called tq_flag which refreshes the
+    //bit timing state machine
+    Timer1.attachInterrupt(BTL_new_time_quanta);
     
     //pinMode(PIN_SP_TEST, INPUT_PULLUP);
     
@@ -42,31 +65,34 @@ void setup() {
 }
 void loop() {
     // cli();
-    // if (wp == true){
-    //     Serial.println(F("WP"));
-        
-    //     wp = false;
-    // }
-    if (sp == true){
+    TOGGLE_write();
+    //TOGGLE_write_serial(); //Ctrl+Shift+L to see in Serial Plotter.
+                           //Must comment other Serial prints
+                           //BTL.cpp line 54,59,86,92,197
+    BTL_sm();
+    if (btl_writing_point == true){
+        Serial.println(F("WP"));
+        stuffer();
+        btl_writing_point = false;
+    }
+    if (btl_sample_point == true){
         // Serial.println(F("SP"));
-        // stuffer();
-        
-        
-        writing_mode = 1;
-        Tx = input2[i] == '1';
-        Rx = input[i] == '1';
-        if (input[i] == 'x'){
-            while(true);
-        }
+        stuffer();
 
-        i++;
+        // writing_mode = 1;
+        // Tx = input2[i] == '1';
+        // Rx = input[i] == '1';
+        // if (input[i] == 'x'){
+        //     while(true);
+        // }
+        // i++;
         
         bit_stuff_monitor(); // Reading
         
         frame_walker(); // Core State Machine
         
         // Error signaling
-        // ack_checker(); 
+        ack_checker(); 
         form_checker();
         bit_monitor();
         crc_checker();
@@ -75,21 +101,21 @@ void loop() {
 
         debug();
         
-        sp = false; // makes sure it enters in the if only once.
+        btl_sample_point = false; // makes sure it enters in the if only once.
     }
-    //sei();
+    // sei();
 }
 
-void test_sp(){
-    sp = true;
-    wp = true;
-}
+// void test_sp(){
+//     btl_sample_point = true;
+//     btl_writing_point = true;
+// }
 
 void testing(){
     
     //Testing  
     Frame test_frame;
-    uint64_t test_id = id_calc(0x0449,0x3007A);
+    // uint64_t test_id = id_calc(0x0449,0x3007A);
     // Frames tested
     // framer(0x0672, 0xAAAAAAAAAAAAAAAA, false, DATA_FRAME, 8, &test_frame);
     // framer(0x0672, 0x0, false, DATA_FRAME, 0, &test_frame);
@@ -102,8 +128,6 @@ void testing(){
     // framer(0x0672, 0xAAAAAAAAAAAAAA, false, DATA_FRAME, 7, &test_frame); 
 
     framer(0x0672, 0x0, false, REMOTE_FRAME, 0, &test_frame); // CRC
-
-    
 
     Serial.println(F("Frame data: "));  
     print_array(in_frame.data, in_frame.frame_size - 1);
@@ -119,12 +143,7 @@ void debug(){
     //     return;
     // }
     Serial.print("State: ");
-    if(overload_flag){
-        Serial.print("OVERLOAD_FLAG");
-    }
-    else{
-        Serial.print(state_str(last_state));
-    }
+    Serial.print(state_str(last_state));
 
     Serial.print("; Rx: ");
     Serial.print(Rx);

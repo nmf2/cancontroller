@@ -1,4 +1,4 @@
-#include "../include/interface.h"
+#include "interface.h"
 #include <Arduino.h>
 
 Frame in_frame; // The frame to be sent
@@ -14,9 +14,6 @@ int error_dominant_count = 0;
 
 
 void stuffer(){
-    if (wp == false){
-        return;
-    }
     if (wait_next_frame){
         Tx = 1;
     }

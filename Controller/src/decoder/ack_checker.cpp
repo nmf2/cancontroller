@@ -1,13 +1,10 @@
 #include "stdbool.h"
-#include "../include/interface.h"
+#include "interface.h"
+# 
 
 bool ack_err;
 
 void ack_checker(){
-    if (sp == 0){
-        return;
-    }
-
     if (ack_err == true) {
         ack_err = false;
     }

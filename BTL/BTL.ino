@@ -70,7 +70,7 @@ bool btl_resync; // indicate a resynchronization (if the falling edge have
 
 //CAN Controller Flags
 //CAN Controller Variables
-bool ccl_bus_idle; //indicate when the bus is idle
+bool idle_bus; //indicate when the bus is idle
 
 //TOGGLE Vector
 bool toggle[TOGGLE_SIZE];
@@ -147,7 +147,7 @@ void BTL_new_time_quanta(){
 void BTL_sm(){
     if(rx_falling){
         cli();
-        if(ccl_bus_idle){
+        if(idle_bus){
             btl_hard_sync = true;
             toggle[TOGGLE_INDEX_HARDSYNC] = !toggle[TOGGLE_INDEX_HARDSYNC];//TOGGLE
             Timer1.restart();   //it will trigger Timer1 Interruption and 
@@ -292,7 +292,7 @@ void BTL_sm(){
     }
 }
 void BTL_print(){
-    if(!(rx_falling && ccl_bus_idle)){
+    if(!(rx_falling && idle_bus)){
         Serial.print("tq_cnt: ");
         Serial.print(btl_tq_cnt);
         Serial.print("\t,current_btl_state: ");
@@ -320,13 +320,13 @@ void BTL_print(){
         Serial.print("\t,phase_error: ");
         Serial.print(btl_phase_error);
         Serial.print("\t,bus_idle: ");
-        Serial.println(ccl_bus_idle);
+        Serial.println(idle_bus);
     }
 }
 
 //CAN Controller Functions Definition
 void CCL_init(){
-    ccl_bus_idle = true;
+    idle_bus = true;
 }
 
 //TOGGLE Lines

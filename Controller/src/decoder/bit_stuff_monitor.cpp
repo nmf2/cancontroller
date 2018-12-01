@@ -1,5 +1,5 @@
 #include "stdbool.h"
-#include "../include/interface.h"
+#include "interface.h"
 
 bool Rstuff_flag;
 bool stuff_err;
@@ -7,9 +7,6 @@ bool bsm_last_bit;
 int bsm_bit_count = 1;
 
 void bit_stuff_monitor(){
-    if (sp == false){
-        return;
-    }
     if (stuff_err == true){
         stuff_err = false;
     }

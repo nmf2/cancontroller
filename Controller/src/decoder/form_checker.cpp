@@ -1,5 +1,5 @@
 #include "stdbool.h"
-#include "../include/interface.h"
+#include "interface.h"
 
 bool form_err;
 int eof_index;
@@ -8,10 +8,6 @@ int eof_index;
 bool overload_flag = false;
 
 void form_checker(){
-    // Make sure it only runs on sample point
-    if (sp == 0){ 
-        return;
-    }
     // Error has been treated, reset the flag and abort.
     if(form_err == true){
         form_err = false;

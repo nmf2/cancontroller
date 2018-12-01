@@ -1,12 +1,12 @@
 #include <Arduino.h> 
 #include <TimerOne.h> 
-#include "CInCAN.h"
+#include "BTL.h"
 
 
 //############################ INSTRUCTIONS ###################################
 //##                                                                         ##
 //##  -> Parameters,Flags,Variables and Functions with the prefixes BTL,CCL  ##
-//##    TOGGLE are defined in the files CInCAN.h and CInCAN.cpp              ##
+//##    TOGGLE are defined in the files BTL.h and BTL.cpp              ##
 //##                                                                         ##           
 //##  -> BTL represents Bit Timing Logic.                                    ##                                                                      ## 
 //##                                                                         ##
@@ -16,19 +16,19 @@
 //##     are part of the project evaluation. They are not important to the   ##
 //##     CAN protocol.                                                       ##
 //##                                                                         ## 
-//##  -> Time Quantum Monitoring: Uncomment line 59 (CInCAN.cpp).            ##
+//##  -> Time Quantum Monitoring: Uncomment line 59 (BTL.cpp).            ##
 //##                                                                         ##
-//##  -> Rx Falling Edge Monitoring: Uncomment line 54 (CInCAN.cpp).         ##
+//##  -> Rx Falling Edge Monitoring: Uncomment line 54 (BTL.cpp).         ##
 //##                                                                         ##
-//##  -> Hard Sync Monitoring: Uncomennt line 86 (CInCAN.cpp).               ##
+//##  -> Hard Sync Monitoring: Uncomennt line 86 (BTL.cpp).               ##
 //##                                                                         ##
-//##  -> Resync Monitoring: Uncomment line 92 (CInCAN.cpp).                  ##
+//##  -> Resync Monitoring: Uncomment line 92 (BTL.cpp).                  ##
 //##                                                                         ##
-//##  -> BTL State Machine Monitoring: Uncomment line 197 (CInCAN.cpp).      ##
+//##  -> BTL State Machine Monitoring: Uncomment line 197 (BTL.cpp).      ##
 //##                                                                         ##
 //##  -> Initializing TOGGLE: Uncomment line 55 (main.cpp).                  ##    
 //##                                                                         ##
-//##  -> Monitoring TOGGLE vector: Uncomment line 198 (CInCAN.cpp).          ##      
+//##  -> Monitoring TOGGLE vector: Uncomment line 198 (BTL.cpp).          ##      
 //##        via IOs:    Uncomment line 73 (main.cpp).                        ##
 //##        via Serial: Uncomment line 74 (main.cpp).                        ##
 //##        *NOTE: monitor via Serial Plotter, uncomment any other use of    ##
@@ -73,6 +73,6 @@ void loop() {
     TOGGLE_write();
     //TOGGLE_write_serial(); //Ctrl+Shift+L to see in Serial Plotter.
                            //Must comment other Serial prints
-                           //CInCAN.cpp line 54,59,86,92,197
+                           //BTL.cpp line 54,59,86,92,197
     BTL_sm(); //runs the Bit Timing Logic State Machine
 }

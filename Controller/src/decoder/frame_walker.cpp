@@ -1,5 +1,5 @@
 #include <stdbool.h>
-#include "../include/interface.h"
+#include "interface.h"
 //#include "../include/util.h"
 
 // To mark the frame as invalid do Frame[0] = 1 (should be zero)
@@ -12,7 +12,7 @@ Frame frame;
 
 int bit_index = 0;
 int ifs_index = 0; //Inter-frame space index
-int idle_bus = 1; // Bus-is-idle flag
+bool idle_bus = 1; // Bus-is-idle flag
 int DLC_value = 0; // Integer value of the DLC field.
 int eol_recessive_count = 0;
 int eol_dominant_count = 0;
@@ -41,7 +41,7 @@ int min(int a, int b){
 #endif
 
 void frame_walker(){
-    if (Rstuff_flag == true || sp == 0){ // Simply return
+    if (Rstuff_flag == true){ // Simply return
         bus_data[bdi++] = Rx;
         return;
     }

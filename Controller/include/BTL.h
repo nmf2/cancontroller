@@ -2,7 +2,7 @@
 #define _CIN_CAN_H_
 
 //Bit Timing Logic Parameters
-#define BTL_TIME_QUANTA 10000 //tq of 1s 
+#define BTL_TIME_QUANTA 1000000 //tq of 1s 
 #define BTL_SJW 4
 #define BTL_SYNC_SEG_SIZE 1
 #define BTL_PROP_SEG_SIZE 1
@@ -47,5 +47,8 @@ void TOGGLE_init();     //Initialize Toggle Vector
 void TOGGLE_write();    //Refresh Toggle outputs
 void TOGGLE_write_serial(); //outputs on Serial
 void TOGGLE_state();    //Refresh toggle[TOGGLE_PIN_STATE_X], X=LSB or X=MSB
+
+extern bool volatile btl_writing_point;
+extern bool volatile btl_sample_point;
 
 #endif
