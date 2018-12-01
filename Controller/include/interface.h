@@ -65,7 +65,8 @@ Frame;
 typedef
 enum State {IDA, RTRA_SRR, IDE, r0, IDB, RTRB, r1_r0, DLC, PAYLOAD,
             CRC, CRCd, ACK, ACKd, EOFR, INTERMISSION1, INTERMISSION2, 
-            ERROR_FLAG, ERROR_DELIMITER, IDLE}
+            ERROR_FLAG, ERROR_DELIMITER, OVERLOAD_FLAG, OVERLOAD_DELIMITER, 
+            IDLE}
 State;
 
 /********************* Functions *********************/
@@ -73,7 +74,8 @@ static inline const char *state_str(State s){
     static const char *strings[] = {
         "IDA", "RTRA_SRR", "IDE", "r0", "IDB", "RTRB", "r1_r0", "DLC", 
         "PAYLOAD", "CRC", "CRCd", "ACK", "ACKd", "EOFR", "INTERMISSION1", 
-        "INTERMISSION2", "ERROR_FLAG", "ERROR_DELIMITER", "IDLE"
+        "INTERMISSION2", "ERROR_FLAG", "ERROR_DELIMITER", "OVERLOAD_FLAG", 
+        "OVERLOAD_DELIMITER", "IDLE"
     };
 
     return strings[s];
@@ -162,6 +164,7 @@ extern bool ack_err;
 /**************** Form Checker Vars ***************/
 extern bool crc_err;
 
+extern bool overload_flag;
 
 /****************************** DEBUG ****************************************/
 extern int eol_dominant_count;
@@ -179,6 +182,8 @@ extern int Sbit_count;
 extern int frm_index;
 extern bool bus_data[300];
 extern int bdi;
+
+void print_array2(bool *array, int inf, int sup);
 
 
 #endif

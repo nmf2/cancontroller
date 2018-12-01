@@ -56,6 +56,14 @@ void print_array(bool *array, int max){
     Serial.println();
 }
 
+void print_array2(bool *array, int inf, int sup){
+    int i = inf;
+    for (; i <= sup; i++){
+        Serial.print(array[i]);
+    }
+    Serial.println();
+}
+
 void printf_arr(bool *array, int end_index){
     //printf("|");
     int i = 0;

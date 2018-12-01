@@ -5,6 +5,7 @@ bool form_err;
 int eof_index;
 
 //(Checked)
+bool overload_flag = false;
 
 void form_checker(){
     // Make sure it only runs on sample point
@@ -56,9 +57,10 @@ void form_checker(){
             break;
         
         // Dominant bit in any of the first two bits of Intermission
-        case INTERMISSION1:                                         //(Checked)
+        case INTERMISSION1:                               //(Checked)
             if(Rx == 0){
-                form_err = true;
+                // form_err = true;
+                state = OVERLOAD_FLAG;
             }
             break;
 

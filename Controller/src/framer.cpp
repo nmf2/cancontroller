@@ -64,7 +64,7 @@ int framer(uint64_t id, unsigned long long int payload, bool extended, bool type
         start_dlc = BIT_START_DLC_A;
         end_dlc = BIT_END_DLC_A;
         start_payload = BIT_START_DATA_A;
-        Serial.println("entrou");
+        //Serial.println("entrou");
     }
     else { // extended == true
         frm->data[BIT_SRR_B] = 1;
@@ -96,7 +96,7 @@ int framer(uint64_t id, unsigned long long int payload, bool extended, bool type
             start_crc = end_dlc + 1;
         } 
         else {
-            end_payload = start_payload + 8*payload_size - 1;
+            end_payload = start_payload + min(64, 8*payload_size) - 1;
             start_crc = end_payload + 1;
         }
         frm->data[rtr] = DATA_FRAME;
@@ -157,8 +157,8 @@ int framer(uint64_t id, unsigned long long int payload, bool extended, bool type
     // PAYLOAD
     if(payload_size > 0 && type == DATA_FRAME){
         //printf("PAYLOAD: |");
-        bool payload_arr[payload_size*8];
-        int_to_bits(payload, payload_arr, 8*payload_size);
+        bool payload_arr[min(64, payload_size*8)];
+        int_to_bits(payload, payload_arr, min(64, payload_size*8));
 
         for (i = start_payload, j = 0; i <= end_payload; i++, j++){
             frm->data[i] = payload_arr[j];

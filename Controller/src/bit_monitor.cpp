@@ -3,16 +3,23 @@
 
 bool lost_arbitration;
 bool bit_err;
+// int arbitration_state = IDE;
 
 void bit_monitor(){
-    if(wp == false){
+    if (sp == false){
         return; 
     }
-    if(bit_err == true){
+    if (bit_err == true){
         bit_err = false;
     }
-    if(writing_mode){
-        if(last_state < CRCd){
+    // if (frame.data[IDE] == 1){
+    //     arbitration_state = RTRB;
+    // } else {
+    //     arbitration_state = IDE;
+    // }
+    if (writing_mode){
+        if(last_state <= IDE + frame.data[BIT_IDE]*(RTRB - IDE)){
+            //Serial.println("Entrou");
             if (Rx != Tx){
                 lost_arbitration = true;
             } else {
@@ -26,5 +33,6 @@ void bit_monitor(){
             }
         }
     }
+
 }
 

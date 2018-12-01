@@ -59,6 +59,7 @@ void frame_walker(){
         case IDA:
             if (bit_index == BIT_END_ID_A){ // this is the last bit of the IDA
                 state = RTRA_SRR;
+                print_array2(frame.data, BIT_START_ID_A, BIT_END_ID_A);
             }
             break;
 
@@ -89,6 +90,7 @@ void frame_walker(){
         case IDB:
             if (bit_index == BIT_END_ID_B){
                 state = RTRB;
+                print_array2(frame.data, BIT_START_ID_B, BIT_END_ID_B);
             }
             break;
         
@@ -130,6 +132,7 @@ void frame_walker(){
                     // The reason for the -1 is because the var is an
                     // index.
                 }
+                print_array2(frame.data, BIT_START_DLC_X, BIT_END_DLC_X);
             }
             break;
         // Data Frame
@@ -138,6 +141,7 @@ void frame_walker(){
                 state = CRC;
                 BIT_Y_START_CRC_X = BIT_END_DATA_X + 1;
                 BIT_Y_END_CRC_X = BIT_Y_START_CRC_X + 15 - 1; // CRC size is 15
+                print_array2(frame.data, BIT_START_DATA_X, BIT_END_DATA_X);
             }
             break;
         
@@ -146,6 +150,7 @@ void frame_walker(){
             if (bit_index == BIT_Y_END_CRC_X){
                 state = CRCd;
                 BIT_Y_CRC_DELIMITER_X = BIT_Y_END_CRC_X + 1;
+                print_array2(frame.data, BIT_Y_START_CRC_X, BIT_Y_END_CRC_X);
             }
             break;
 
@@ -182,12 +187,12 @@ void frame_walker(){
             break;
 
         case INTERMISSION2:
-            state = IDLE;
+            state = IDLE; 
             ifs_index = 0;
             if(Rx != 0){ // If Rx == 0 execute the statements for IDLE as well
                 break;
             }
-        
+
         case IDLE:
             if (Rx == 1) {
                 idle_bus = 1;
@@ -205,12 +210,12 @@ void frame_walker(){
         case ERROR_FLAG:
             if (Rx == 0){
                 eol_dominant_count++;
-                if (eol_dominant_count >= 13){ 
-                    /* need to reset the state, the fisrt bit of the delimiter
-                       is dominant. 
-                    */
-                    eol_dominant_count = 0;
-                }
+                // if (eol_dominant_count >= 13){ 
+                //     /* need to reset the state, the fisrt bit of the delimiter
+                //        is dominant. 
+                //     */
+                //     eol_dominant_count = 0;
+                // }
             } 
             else if (Rx == 1 && eol_dominant_count >= 6){
                 state = ERROR_DELIMITER;
@@ -232,6 +237,36 @@ void frame_walker(){
                 }
             }
             break;
+            
+        case OVERLOAD_FLAG:
+            if (Rx == 0){
+                eol_dominant_count++;
+                // if (eol_dominant_count >= 13){ 
+                //     state = ERROR_FLAG;
+                //     eol_dominant_count = 0;
+                // }
+            } 
+            else if (Rx == 1 && eol_dominant_count >= 5){
+                state = OVERLOAD_DELIMITER;
+                eol_recessive_count = 0;
+            }
+            break;
+        
+        case OVERLOAD_DELIMITER:
+            if (Rx == 0){ //error, go back to ERROR_FLAG
+                state = ERROR_FLAG;
+                eol_dominant_count = 1;
+            } else { // Rx == RECESSIVE
+                eol_recessive_count++;
+                if (eol_recessive_count == 7){
+                    state = INTERMISSION1;
+                    eol_recessive_count = 0;
+                    eol_dominant_count = 0;
+                    ifs_index = 0;
+                }
+            }
+            break;
+        
     }
 
 }

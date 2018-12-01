@@ -4,7 +4,7 @@
 bool Rstuff_flag;
 bool stuff_err;
 bool bsm_last_bit;
-int bsm_bit_count;
+int bsm_bit_count = 1;
 
 void bit_stuff_monitor(){
     if (sp == false){
@@ -38,6 +38,7 @@ void bit_stuff_monitor(){
     }
     else {
         bsm_bit_count = 1;
+        bsm_last_bit = 0;
         Rstuff_flag = false;
     }
 }
