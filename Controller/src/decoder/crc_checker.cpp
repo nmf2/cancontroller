@@ -30,15 +30,6 @@ void crc_checker(){
         // Serial.println(crc);
         // Serial.print("frame_crc: ");
         // Serial.println(frame_crc);
-        if (frame_crc != crc){
-            frame_valid = false;
-        } else {
-            frame_valid = true;
-        }
-    }
-    else if (last_state == ACKd){ // Decide if there is an error
-        // Get frame's CRC
-        frame_valid = true; // Reset var, was used on ACK state by stuffer.
         if(frame_crc != crc){
             crc_err = true;
         } else {
