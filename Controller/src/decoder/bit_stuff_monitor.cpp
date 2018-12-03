@@ -12,6 +12,7 @@ void bit_stuff_monitor(){
     }
     if(state == IDLE){
         bsm_bit_count = 1; // SOF
+        bsm_last_bit = 0;
     } 
     else if (state < CRCd){
         if (Rstuff_flag == true){

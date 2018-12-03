@@ -21,8 +21,8 @@ int counter = 10;
 
 int i = 0;
 
-// const char input[]  =   "0110011100100000100110101010110011100001010101111111100000011111111x";
-// const char input2[] =   "0110011100100000100110101010110011100001010101111111100000011111111x";
+const char input[]  =   "000000000000000x";
+const char input2[] =   "000000000000000x";
 
 //Frame test_frame;
 
@@ -78,16 +78,17 @@ void loop() {
     if (btl_sample_point == true){
         Serial.println(F("SP"));
 
-        // writing_mode = 1;
-        // Tx = input2[i] == '1';
-        // Rx = input[i] == '1';
-        Rx = digitalRead(PIN_RX);
-        // if (input[i] == 'x'){
-        //     while(true);
-        // }
-        // i++;
-        Rx = digitalRead(PIN_RX);
+        writing_mode = 1;
+        Tx = input2[i] == '1';
+        Rx = input[i] == '1';
+        // Rx = digitalRead(PIN_RX);
+        if (input[i] == 'x'){
+            while(true);
+        }
+        i++;
+        // Rx = digitalRead(PIN_RX);
         bit_stuff_monitor(); // Reading
+        err = stuff_err;
         
         frame_walker(); // Core State Machine
         
@@ -147,10 +148,10 @@ void debug(){
 
     Serial.print("; Rx: ");
     Serial.print(Rx);
-    // Serial.print("; Tx: ");
-    // Serial.print(Tx);
-    // Serial.print("; bit_index: ");
-    // Serial.print(bit_index);
+    Serial.print("; Tx: ");
+    Serial.print(Tx);
+    Serial.print("; bit_index: ");
+    Serial.print(bit_index);
     // Serial.print("; frm_index: ");
     // Serial.print(frm_index);
     // Serial.print("; DLC: ");
@@ -159,8 +160,8 @@ void debug(){
         Serial.print("; Rstuff_flag: ");
         Serial.print(Rstuff_flag);
     }
-    // Serial.print("; Tstuff_flag: ");
-    // Serial.print(Tstuff_flag);
+    Serial.print("; Tstuff_flag: ");
+    Serial.print(Tstuff_flag);
     // Serial.print("; Sbit_count: ");
     // Serial.print(Sbit_count);
     // Serial.print("; writing_mode: ");
@@ -195,6 +196,11 @@ void debug(){
         Serial.print("; crc_err: ");
         Serial.print(crc_err);
     }
+    if(err){
+        Serial.print("; err: ");
+        Serial.print(err);
+    }
+    
     Serial.print("; bsm_bit_count: ");
     Serial.print(bsm_bit_count);
     Serial.print("; bsm_last_bit: ");
