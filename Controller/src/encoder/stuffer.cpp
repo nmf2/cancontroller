@@ -14,7 +14,20 @@ int error_dominant_count = 0;
 
 
 void stuffer(){
-    if (wait_next_frame){
+    if (state == ERROR_FLAG){
+        if(error_dominant_count <= 6){
+            Tx = 0;
+        } 
+        else {
+            Tx = 1;
+        }
+        error_dominant_count++;
+    }
+    else if (state == ERROR_DELIMITER){
+        error_dominant_count = 0;
+        Tx = 1;
+    }
+    else if (wait_next_frame){
         Tx = 1;
     }
     else if (lost_arbitration){
@@ -29,19 +42,6 @@ void stuffer(){
 
         Tstuff_flag = false;
         Sbit_count = 1;
-    }
-    else if (state == ERROR_FLAG){
-        if(error_dominant_count <= 6){
-            Tx = 0;
-        } 
-        else {
-            Tx = 1;
-        }
-        error_dominant_count++;
-    }
-    else if (state == ERROR_DELIMITER){
-        error_dominant_count = 0;
-        Tx = 1;
     }
     else if (writing_mode){ // if there is anything to write
         Tx = in_frame.data[frm_index];        

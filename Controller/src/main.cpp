@@ -21,8 +21,8 @@ int counter = 10;
 
 int i = 0;
 
-const char input[]  =   "000000000000000x";
-const char input2[] =   "000000000000000x";
+const char input[]  =   "010000000000000x";
+const char input2[] =   "010000000000000x";
 
 //Frame test_frame;
 
@@ -78,15 +78,15 @@ void loop() {
     if (btl_sample_point == true){
         Serial.println(F("SP"));
 
-        writing_mode = 1;
-        Tx = input2[i] == '1';
-        Rx = input[i] == '1';
-        // Rx = digitalRead(PIN_RX);
-        if (input[i] == 'x'){
-            while(true);
-        }
-        i++;
-        // Rx = digitalRead(PIN_RX);
+        // writing_mode = 1;
+        // Tx = input2[i] == '1';
+        // Rx = input[i] == '1';
+        // if (input[i] == 'x'){
+        //     while(true);
+        // }
+        // i++;
+        
+        Rx = digitalRead(PIN_RX);
         bit_stuff_monitor(); // Reading
         err = stuff_err;
         
