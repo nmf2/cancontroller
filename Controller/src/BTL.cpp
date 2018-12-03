@@ -239,11 +239,6 @@ void BTL_print(){
     }
 }
 
-// CAN Controller Functions Definition
-void CCL_init(){
-    idle_bus = false;
-}
-
 // TOGGLE Lines
 // Time Quanta -> 61
 // HardSync -> 69

@@ -6,7 +6,7 @@
 //############################ INSTRUCTIONS ###################################
 //##                                                                         ##
 //##  -> Parameters,Flags,Variables and Functions with the prefixes BTL,CCL  ##
-//##    TOGGLE are defined in the files BTL.h and BTL.cpp              ##
+//##    TOGGLE are defined in the files BTL.h and BTL.cpp                    ##
 //##                                                                         ##           
 //##  -> BTL represents Bit Timing Logic.                                    ##                                                                      ## 
 //##                                                                         ##

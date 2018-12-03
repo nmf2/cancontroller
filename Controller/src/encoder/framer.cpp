@@ -11,7 +11,7 @@
 //     va_start (args, fmt );
 //     vsnprintf(buf, 128, fmt, args);
 //     va_end (args);
-//     Serial.print(buf);
+    // Serial.print(buf);
 // }
 
 //// void printb(bool bit){ printf("%d|", bit); }
@@ -62,7 +62,6 @@ int framer(uint64_t id, unsigned long long int payload, bool extended, bool type
         start_dlc = BIT_START_DLC_A;
         end_dlc = BIT_END_DLC_A;
         start_payload = BIT_START_DATA_A;
-        //Serial.println("entrou");
     }
     else { // extended == true
         frm->data[BIT_SRR_B] = 1;

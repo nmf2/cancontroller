@@ -2,7 +2,7 @@
 #include "interface.h"
 # 
 
-bool ack_err;
+bool ack_err = false;
 
 void ack_checker(){
     if (ack_err == true) {

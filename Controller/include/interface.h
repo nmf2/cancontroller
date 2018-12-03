@@ -160,9 +160,9 @@ extern bool form_err;
 /**************** Acknoledgement Checker Vars ***************/
 extern bool ack_err;
 
-/**************** Form Checker Vars ***************/
+/**************** CRC Checker Vars ***************/
 extern bool crc_err;
-
+extern bool frame_valid;
 extern bool overload_flag;
 
 /****************************** DEBUG ****************************************/

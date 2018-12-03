@@ -8,7 +8,7 @@ bool Tstuff_flag = 0;
 int frm_index = 0; // Equivalent to bit_index in Frame Walker
 bool wait_next_frame = 0; // activated when lost arbitration
 bool writing_mode = 0; // Indicates if it's currently writing a frame;
-bool last_Tx;
+bool last_Tx = 1;
 int error_dominant_count = 0;
 //bool bus_data[300] = { 0 };
 
@@ -77,7 +77,14 @@ void stuffer(){
             frm_index++;
         }
     } 
-    else { // Nothing to do, all in order and no frames to send
+    else if (state == ACK){
+        if (frame_valid == true){
+            Tx = 0; // Signal everything is fine.
+        } else {
+            Tx = 1; // No good, error will start after ACKd.
+        }
+    }
+    else { // Do nothing, all is fine.
         Tx = 1;
     }
 

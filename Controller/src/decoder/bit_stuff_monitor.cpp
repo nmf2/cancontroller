@@ -1,9 +1,9 @@
 #include "stdbool.h"
 #include "interface.h"
 
-bool Rstuff_flag;
-bool stuff_err;
-bool bsm_last_bit;
+bool Rstuff_flag = false;
+bool stuff_err = false;
+bool bsm_last_bit = 1;
 int bsm_bit_count = 1;
 
 void bit_stuff_monitor(){

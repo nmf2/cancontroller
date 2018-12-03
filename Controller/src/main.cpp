@@ -38,8 +38,7 @@ void setup() {
 
     //Initializing Bit Timing Logic 
     BTL_init();
-    //Initializing Can Controller
-    CCL_init();
+
     //Initializing TOGGLE
     TOGGLE_init();
 
@@ -71,7 +70,7 @@ void loop() {
                            //BTL.cpp line 54,59,86,92,197
     BTL_sm();
     if (btl_writing_point == true){
-        Serial.println(F("WP"));
+        // Serial.println(F("WP"));
         stuffer();
         digitalWrite(PIN_TX, Tx);
         btl_writing_point = false;
@@ -82,6 +81,7 @@ void loop() {
         // writing_mode = 1;
         // Tx = input2[i] == '1';
         // Rx = input[i] == '1';
+        Rx = digitalRead(PIN_RX);
         // if (input[i] == 'x'){
         //     while(true);
         // }
@@ -101,7 +101,7 @@ void loop() {
 
         debug();
         
-        btl_sample_point = false; // makes sure it enters in the if only once.
+        btl_sample_point = false; // makes sure it enters the if only once.
     }
     sei();
 }
@@ -129,9 +129,9 @@ void testing(){
 
     framer(0x0672, 0x0, false, REMOTE_FRAME, 0, &test_frame); // CRC
 
-    Serial.println(F("Frame data: "));  
-    print_array(in_frame.data, in_frame.frame_size - 1);
-    Serial.println(F("-----------------------------------------------------"));
+    // Serial.println(F("Frame data: "));  
+    // print_array(in_frame.data, in_frame.frame_size - 1);
+    // Serial.println(F("-----------------------------------------------------"));
     // Serial.println();
     // print_array(test_frame.data, test_frame.frame_size - 1);
     // Serial.println(test_frame.frame_size);

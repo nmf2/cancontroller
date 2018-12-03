@@ -2,8 +2,8 @@
 #include "interface.h"
 #include "BTL.h"
 
-bool lost_arbitration;
-bool bit_err;
+bool lost_arbitration = false;
+bool bit_err = false;
 // int arbitration_state = IDE;
 
 void bit_monitor(){

@@ -1,10 +1,9 @@
 #include "stdbool.h"
 #include "interface.h"
 
-bool form_err;
-int eof_index;
+bool form_err = false;
 
-//(Checked)
+
 bool overload_flag = false;
 
 void form_checker(){

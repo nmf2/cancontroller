@@ -24,11 +24,6 @@ void BTL_new_time_quanta(); //ISR of Timer1
 void BTL_sm(); //Runs the Bit Timing Logic State Machine
 void BTL_print(); //helps when debugging
 
-//CAN Controller Parameters
-
-//CAN Controller Functions
-void CCL_init(); //Initialize CAN Controller Variables
-
 //TOGGLE Parameters
 #define TOGGLE_SIZE 5
 #define TOGGLE_INDEX_TQ 0
