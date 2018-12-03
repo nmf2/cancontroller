@@ -14,7 +14,7 @@ int error_dominant_count = 0;
 
 
 void stuffer(){
-    if (state == ERROR_FLAG){
+    if (state == ERROR_FLAG || state == OVERLOAD_FLAG){
         if(error_dominant_count <= 6){
             Tx = 0;
         } 
@@ -22,12 +22,18 @@ void stuffer(){
             Tx = 1;
         }
         error_dominant_count++;
+        wait_next_frame = false;
+        frm_index = 0;
     }
-    else if (state == ERROR_DELIMITER){
+    else if (state == ERROR_DELIMITER || state == OVERLOAD_DELIMITER){
         error_dominant_count = 0;
         Tx = 1;
     }
+    else if (state == INTERMISSION1 || state == INTERMISSION2){
+        Tx = 1;
+    }
     else if (wait_next_frame){
+        Serial.println("waiting");
         Tx = 1;
     }
     else if (lost_arbitration){
@@ -44,6 +50,7 @@ void stuffer(){
         Sbit_count = 1;
     }
     else if (writing_mode){ // if there is anything to write
+        Serial.println("wm");
         Tx = in_frame.data[frm_index];        
 
         // Serial.print("Tx: ");
@@ -71,7 +78,9 @@ void stuffer(){
         }
 
         if (frm_index == (in_frame.frame_size - 1)){ //finished writing
-            writing_mode = 0; // signaling that there is nothing to write
+            Serial.println("Done transmitting");
+            writing_mode = false; // signaling that there is nothing to write
+            frm_index = 0;
         }
         else {
             frm_index++;

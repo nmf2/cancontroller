@@ -164,16 +164,20 @@ void debug(){
     Serial.print(Tstuff_flag);
     // Serial.print("; Sbit_count: ");
     // Serial.print(Sbit_count);
-    // Serial.print("; writing_mode: ");
-    // Serial.print(writing_mode);
+    if(writing_mode){
+        Serial.print("; writing_mode: ");
+        Serial.print(writing_mode);
+    }
     if(last_state >= ERROR_FLAG){
         Serial.print("; eol_recessive_count: ");
         Serial.print(eol_recessive_count);
         Serial.print("; eol_dominant_count: ");
         Serial.print(eol_dominant_count);
     }
-    // Serial.print("; lost_arbitration: ");
-    // Serial.print(lost_arbitration);
+    if(lost_arbitration){
+        Serial.print("; lost_arbitration: ");
+        Serial.print(lost_arbitration);
+    }
 
     Serial.println();
     if(form_err){

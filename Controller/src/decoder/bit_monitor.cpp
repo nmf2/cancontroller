@@ -30,6 +30,9 @@ void bit_monitor(){
                 bit_err = true;
             }
         }
+        else {
+            lost_arbitration = false;
+        }
     }
 
 }
