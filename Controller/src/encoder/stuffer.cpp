@@ -46,11 +46,11 @@ void stuffer(){
     else if (writing_mode){ // if there is anything to write
         Tx = in_frame.data[frm_index];        
 
-        Serial.print("Tx: ");
-        Serial.println(Tx);
+        // Serial.print("Tx: ");
+        // Serial.println(Tx);
 
-        Serial.print("Frm_index: ");
-        Serial.println(frm_index);
+        // Serial.print("Frm_index: ");
+        // Serial.println(frm_index);
 
         // Bit stuffing
         if (state < CRCd){

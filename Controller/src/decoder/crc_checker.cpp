@@ -25,10 +25,10 @@ void crc_checker(){
         short frame_crc = (short) bits_to_int(BIT_Y_START_CRC_X, 
                                               BIT_Y_END_CRC_X, 
                                               frame.data);
-        Serial.print("crc: ");
-        Serial.println(crc);
-        Serial.print("frame_crc: ");
-        Serial.println(frame_crc);
+        // Serial.print("crc: ");
+        // Serial.println(crc);
+        // Serial.print("frame_crc: ");
+        // Serial.println(frame_crc);
         if(frame_crc != crc){
             crc_err = true;
         }

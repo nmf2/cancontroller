@@ -64,7 +64,7 @@ void setup() {
     Rx = 1;
 }
 void loop() {
-    // cli();
+    cli();
     TOGGLE_write();
     //TOGGLE_write_serial(); //Ctrl+Shift+L to see in Serial Plotter.
                            //Must comment other Serial prints
@@ -73,11 +73,11 @@ void loop() {
     if (btl_writing_point == true){
         Serial.println(F("WP"));
         stuffer();
+        digitalWrite(PIN_TX, Tx);
         btl_writing_point = false;
     }
     if (btl_sample_point == true){
-        // Serial.println(F("SP"));
-        stuffer();
+        Serial.println(F("SP"));
 
         // writing_mode = 1;
         // Tx = input2[i] == '1';
@@ -86,7 +86,7 @@ void loop() {
         //     while(true);
         // }
         // i++;
-        
+        Rx = digitalRead(PIN_RX);
         bit_stuff_monitor(); // Reading
         
         frame_walker(); // Core State Machine
@@ -103,7 +103,7 @@ void loop() {
         
         btl_sample_point = false; // makes sure it enters in the if only once.
     }
-    // sei();
+    sei();
 }
 
 // void test_sp(){

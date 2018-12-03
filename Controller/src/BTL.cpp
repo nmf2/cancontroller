@@ -65,7 +65,7 @@ void BTL_new_time_quanta(){
 
 void BTL_sm(){
     if(rx_falling){
-        cli();
+        //cli();
         if(idle_bus){
             btl_hard_sync = true;
             btl_sample_point = false;
@@ -79,7 +79,7 @@ void BTL_sm(){
             toggle[TOGGLE_INDEX_RESYNC] = !toggle[TOGGLE_INDEX_RESYNC];// TOGGLE
         }
         rx_falling = false;
-        sei();
+        //sei();
     }
 
     if(tq_flag){
