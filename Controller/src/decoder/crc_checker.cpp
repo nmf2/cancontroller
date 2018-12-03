@@ -8,6 +8,8 @@
 
 bool crc_err = false;
 short crc = 0 ^ 0; // Already treating SOF
+bool frame_valid = true;
+short frame_crc = 0;
 
 void crc_checker(){
     if (Rstuff_flag){
@@ -20,20 +22,31 @@ void crc_checker(){
     if (last_state < CRC){
         crc = next_crc(crc, Rx);
     }
-    else if (last_state == ACKd){ // Decide if there is an error
-        // Get frame's CRC
-        short frame_crc = (short) bits_to_int(BIT_Y_START_CRC_X, 
+    else if (last_state == CRCd){
+        frame_crc = (short) bits_to_int(BIT_Y_START_CRC_X, 
                                               BIT_Y_END_CRC_X, 
                                               frame.data);
-        Serial.print("crc: ");
-        Serial.println(crc);
-        Serial.print("frame_crc: ");
-        Serial.println(frame_crc);
-        if(frame_crc != crc){
-            crc_err = true;
+        // Serial.print("crc: ");
+        // Serial.println(crc);
+        // Serial.print("frame_crc: ");
+        // Serial.println(frame_crc);
+        if (frame_crc != crc){
+            frame_valid = false;
+        } else {
+            frame_valid = true;
         }
     }
-    else if ( last_state > ACKd){
+    else if (last_state == ACKd){ // Decide if there is an error
+        // Get frame's CRC
+        frame_valid = true; // Reset var, was used on ACK state by stuffer.
+        if(frame_crc != crc){
+            crc_err = true;
+        } else {
+            crc_err = false;
+        }
+    }
+    else if (last_state > ACKd){
         crc = 0 ^ 0; //Already prepare for SOF
+        frame_valid = true;
     }
 }
